@@ -1,16 +1,43 @@
 button.primary-button {
+  background-color: #282c34;
+  color: white;
   border-radius: 15px;
   height: 30px;
   cursor: pointer;
   padding-left: 15px;
   padding-right: 15px;
+  margin: 0 5px;
+
+  &:hover {
+    background-color: #3d4251;
+  }
+}
+button.secondary-button {
+  background-color: #ececec;
+
+  border-radius: 15px;
+  height: 30px;
+  cursor: pointer;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin: 0 5px;
+
+  &:hover {
+    background-color: #c8c8c8;
+  }
 }
 
 button.remove-button {
+  background-color: #ececec;
   border-radius: 15px;
   width: 30px;
   height: 30px;
   cursor: pointer;
+  margin: 0 5px;
+
+  &:hover {
+    background-color: #c8c8c8;
+  }
 }
 
 input {

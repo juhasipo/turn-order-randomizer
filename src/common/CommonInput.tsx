@@ -6,6 +6,11 @@ export const PrimaryButton = (props: React.ButtonHTMLAttributes<{}>) => {
         <button className={"primary-button"} {...props}>{props.children}</button>
     )
 }
+export const SecondaryButton = (props: React.ButtonHTMLAttributes<{}>) => {
+    return (
+        <button className={"secondary-button"} {...props}>{props.children}</button>
+    )
+}
 
 export const RemoveButton = (props: React.ButtonHTMLAttributes<{}>) => {
     return (
