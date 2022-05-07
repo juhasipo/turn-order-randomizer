@@ -2,7 +2,8 @@ import React from 'react';
 import Table from './Table';
 import PlayerList from './PlayerList'
 import './App.scss';
-import {NewPlayer, Player, PlayerId, PlayerIndex} from "./CommonTypes";
+import {LabelTypeId, LabelTypeIndex, NewLabelType, NewPlayer, Player, PlayerId, PlayerIndex} from "./CommonTypes";
+import LabelTypeList from "./LabelList";
 
 const defaultPlayers: PlayerIndex = new Map<PlayerId, Player>();
 
@@ -19,9 +20,10 @@ const shuffle = (array: Array<number>): Array<number> => {
 
 const App = () => {
 
-    const [players, setPlayers] = React.useState<PlayerIndex>(defaultPlayers)
-    const [idPool, setIdPool] = React.useState<PlayerId>(1)
-    const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>([])
+    const [players, setPlayers] = React.useState<PlayerIndex>(defaultPlayers);
+    const [idPool, setIdPool] = React.useState<PlayerId>(1);
+    const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>([]);
+    const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(new Map());
 
     const incrementId = () => {
         setIdPool(idPool + 1);
@@ -53,6 +55,21 @@ const App = () => {
         resetPlayerOrder();
     }
 
+    const labelTypeAdded = (label: NewLabelType) => {
+        const newLabel = {
+            id: idPool,
+            ...label
+        };
+        setLabelTypes(new Map(labelTypes.set(newLabel.id, newLabel)));
+        incrementId();
+    }
+
+    const labelTypeRemoved = (id: LabelTypeId) => {
+        const withRemoved = new Map(labelTypes);
+        withRemoved.delete(id)
+        setLabelTypes(withRemoved);
+    }
+
     return (
         <div className="App">
             <header className="App-header">
@@ -62,6 +79,11 @@ const App = () => {
                 </div>
             </header>
             <main>
+                <LabelTypeList
+                    labelTypeAdded={labelTypeAdded}
+                    labelTypeRemoved={labelTypeRemoved}
+                    labels={labelTypes}
+                />
                 <PlayerList
                     playerAdded={playerAdded}
                     playerRemoved={playerRemoved}

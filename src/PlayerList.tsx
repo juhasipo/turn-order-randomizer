@@ -10,15 +10,15 @@ export interface Props {
 }
 
 const sortByName = (nameA: string, nameB: string) => {
-if (nameA < nameB) {
-    return -1;
-  }
-  if (nameA > nameB) {
-    return 1;
-  }
+    if (nameA < nameB) {
+        return -1;
+    }
+    if (nameA > nameB) {
+        return 1;
+    }
 
-  // names must be equal
-  return 0;
+    // names must be equal
+    return 0;
 }
 
 export default class PlayerList extends React.Component<Props, any> {
