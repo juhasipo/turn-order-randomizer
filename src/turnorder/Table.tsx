@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {Player, PlayerId, PlayerIndex} from "./CommonTypes";
-import {PrimaryButton} from "./CommonInput";
+import {Player, PlayerId, PlayerIndex} from "../common/CommonTypes";
+import {PrimaryButton} from "../common/CommonInput";
 
 export interface Props {
     players: PlayerIndex;
@@ -31,7 +31,7 @@ export default class Table extends React.Component<Props, any> {
         return (
             <div className={'table'}>
                 <h2>Table</h2>
-                <PrimaryButton onClick={this.props.randomizePlayers}>Randomize</PrimaryButton>
+                <PrimaryButton onClick={this.props.randomizePlayers}>Randomize Turn Order</PrimaryButton>
                 <ol>{this.getPlayerItems(this.props.players, this.props.playerOrder)}</ol>
             </div>
         );

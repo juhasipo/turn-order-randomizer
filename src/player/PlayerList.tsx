@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {Player, NewPlayer, PlayerIndex, PlayerId} from "./CommonTypes";
+import {Player, NewPlayer, PlayerIndex, PlayerId} from "../common/CommonTypes";
 import AddPlayer from "./AddPlayer";
-import {RemoveButton} from "./CommonInput";
+import {RemoveButton} from "../common/CommonInput";
 
 export interface Props {
     playerAdded: (player: NewPlayer) => void;

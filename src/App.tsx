@@ -1,9 +1,9 @@
 import React from 'react';
-import Table from './Table';
-import PlayerList from './PlayerList'
+import Table from './turnorder/Table';
+import PlayerList from './player//PlayerList'
 import './App.scss';
-import {LabelTypeId, LabelTypeIndex, NewLabelType, NewPlayer, Player, PlayerId, PlayerIndex} from "./CommonTypes";
-import LabelTypeList from "./LabelList";
+import {LabelTypeId, LabelTypeIndex, NewLabelType, NewPlayer, Player, PlayerId, PlayerIndex} from "./common/CommonTypes";
+import LabelTypeList from "./label/LabelList";
 
 const defaultPlayers: PlayerIndex = new Map<PlayerId, Player>();
 

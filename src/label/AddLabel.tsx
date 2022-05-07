@@ -1,16 +1,16 @@
 import * as React from 'react';
-import {NewPlayer} from "./CommonTypes";
-import {PrimaryButton} from "./CommonInput";
+import {NewLabelType, NewPlayer} from "../common/CommonTypes";
+import {PrimaryButton} from "../common/CommonInput";
 
 export interface Props {
-    playerAdded: (player: NewPlayer) => void;
+    labelAdded: (label: NewLabelType) => void;
 }
 
-const AddPlayer = (props: Props) => {
+const AddLabel = (props: Props) => {
     const [name, setName] = React.useState('');
 
     const addPlayer = (_: any) => {
-        props.playerAdded({
+        props.labelAdded({
             name: name,
         });
     };
@@ -18,7 +18,7 @@ const AddPlayer = (props: Props) => {
     return (
         <div>
             <label>
-                Player:
+                Label:
                 <input type={"text"} name={"name"} onChange={(event) => setName(event.target.value)}/>
             </label>
             <PrimaryButton onClick={addPlayer}>Add</PrimaryButton>
@@ -26,4 +26,4 @@ const AddPlayer = (props: Props) => {
     );
 }
 
-export default AddPlayer;
+export default AddLabel;

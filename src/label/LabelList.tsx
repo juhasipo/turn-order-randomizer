@@ -8,9 +8,8 @@ import {
     LabelTypeIndex,
     NewLabelType,
     LabelType
-} from "./CommonTypes";
-import AddPlayer from "./AddPlayer";
-import {RemoveButton} from "./CommonInput";
+} from "../common/CommonTypes";
+import {RemoveButton} from "../common/CommonInput";
 import AddLabel from "./AddLabel";
 
 export interface Props {
