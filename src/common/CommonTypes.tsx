@@ -2,13 +2,17 @@ export type PlayerId = number;
 export type LabelTypeId = number;
 export type LabelItemId = number;
 
-export type Label = string;
+export interface PlayerLabel {
+    fixed: boolean;
+    typeId: LabelTypeId;
+    itemId: LabelItemId;
+}
 
 export interface Player {
     id: number;
     name: string;
     number?: number;
-    labels?: Array<Label>;
+    labels: Map<LabelTypeId, PlayerLabel>;
 }
 
 export interface NewPlayer {
@@ -36,4 +40,5 @@ export interface NewLabelItem {
 }
 
 export type LabelTypeIndex = Map<LabelTypeId, LabelType>;
-export type LabelIndex = Map<LabelTypeId, Map<LabelItemId, LabelItem>>;
+export type LabelItemMap = Map<LabelItemId, LabelItem>
+export type LabelItemIndex = Map<LabelTypeId, LabelItemMap>;
