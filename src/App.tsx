@@ -14,6 +14,7 @@ import {
     PlayerIndex, PlayerLabel
 } from "./common/CommonTypes";
 import LabelTypeList from "./label/LabelList";
+import {Collapse} from "./common/CommonComponents";
 
 const defaultPlayers: PlayerIndex = new Map<PlayerId, Player>();
 
@@ -172,20 +173,30 @@ const App = () => {
                 </div>
             </header>
             <main>
-                <LabelTypeList
-                    labelTypeAdded={labelTypeAdded}
-                    labelTypeRemoved={labelTypeRemoved}
+                <Collapse
+                    title={"Labels"}
+                    subtitle={`${labelTypes.size} label types`}
+                >
+                    <LabelTypeList
+                        labelTypeAdded={labelTypeAdded}
+                        labelTypeRemoved={labelTypeRemoved}
 
-                    labelItemAdded={labelItemAdded}
-                    labelItemRemoved={labelItemRemoved}
+                        labelItemAdded={labelItemAdded}
+                        labelItemRemoved={labelItemRemoved}
 
-                    labels={labelTypes}
-                    labelItems={labelItems}
-                />
-                <PlayerList
-                    playerAdded={playerAdded}
-                    playerRemoved={playerRemoved}
-                    players={players}/>
+                        labels={labelTypes}
+                        labelItems={labelItems}
+                    />
+                </Collapse>
+                <Collapse
+                    title={"Players"}
+                    subtitle={`${players.size} players`}
+                >
+                    <PlayerList
+                        playerAdded={playerAdded}
+                        playerRemoved={playerRemoved}
+                        players={players}/>
+                </Collapse>
                 <Table
                     players={players}
                     playerOrder={playerOrder}
