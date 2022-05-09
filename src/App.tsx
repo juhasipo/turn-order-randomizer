@@ -93,6 +93,11 @@ const toObject = (map: Map<any, any>): any => {
     }));
 }
 
+const generateLink = (fragment: string) => {
+    const href = window.location.href;
+    return href.substring(0, href.indexOf("#")) + "#" + fragment;
+}
+
 const fragment = window.location.hash;
 if (fragment) {
     try {
@@ -128,8 +133,9 @@ const App = () => {
     const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(status.labelTypes);
     const [labelItems, setLabelItems] = React.useState<LabelItemIndex>(status.labelItems);
     const [labelModalOpen, setLabelModalOpen] = React.useState<boolean>(false);
+    const [link, setLink] = React.useState('');
 
-    const logStatusAsBase64 = () => {
+    const generateStatusAsBase64 = (): string => {
         const status = {
             players: toObject(players),
             labelTypes: toObject(labelTypes),
@@ -138,11 +144,8 @@ const App = () => {
             idPool: idPool,
         };
 
-        console.log(status);
         const statusJson = JSON.stringify(status);
-        const statusBase64 = window.btoa(statusJson);
-        console.log("Status: " + statusJson);
-        console.log("Status: " + statusBase64);
+        return window.btoa(statusJson);
     };
 
     const openLabelModal = () => {
@@ -340,8 +343,17 @@ const App = () => {
         <div className="App">
             <header className="App-header navbar">
                 <div className="App-header-container">
-                    <h1 onClick={(e) => logStatusAsBase64()}>Turn Order Randomizer</h1>
+                    <h1>Turn Order Randomizer</h1>
                     <sub>2.0.0</sub>
+                    <sub>
+                        {!!link && <a href={link}>{link}</a>}
+                        <button
+                            className={"button is-link"}
+                            onClick={(e) => setLink(generateLink(generateStatusAsBase64()))}
+                        >
+                            Generate Link
+                        </button>
+                    </sub>
                 </div>
             </header>
             <main className={"section"}>
