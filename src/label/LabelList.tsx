@@ -3,10 +3,11 @@ import {
     LabelTypeId,
     LabelTypeIndex,
     NewLabelType,
-    LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItemMap, LabelItem
+    LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItemMap, LabelItem, LABEL_TYPE_MODE_TO_NAME
 } from "../common/CommonTypes";
 import {SecondaryButton, RemoveButton} from "../common/CommonInput";
 import {useState} from "react";
+import {Collapse} from "../common/CommonComponents";
 
 export interface Props {
     labelTypeAdded: (label: NewLabelType) => void;
@@ -111,10 +112,12 @@ export default class LabelTypeList extends React.Component<Props, any> {
 
     getLabelTypeItem = (label: LabelType, labelItems: LabelItemIndex) => {
         return (
-            <div key={label.name} className={"panel is-info"}>
-                <div className={"panel-heading"}>
-                    <p>{label.name} {label.mode}</p>
-                </div>
+            <Collapse
+                key={label.name}
+                title={label.name}
+                subtitle={LABEL_TYPE_MODE_TO_NAME.get(label.mode)}
+                modalStyle={"is-info"}
+            >
                 <div className={"panel-block"}>
                     <div className={"label-items"}>
                         {this.getLabelItems(label.id, labelItems.get(label.id) || new Map())}
@@ -125,7 +128,7 @@ export default class LabelTypeList extends React.Component<Props, any> {
                         Remove Label Type
                     </SecondaryButton>
                 </div>
-            </div>
+            </Collapse>
         )
     }
 

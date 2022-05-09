@@ -1,4 +1,4 @@
-import {LabelTypeMode, NewLabelItem, NewLabelType} from "../common/CommonTypes";
+import {LABEL_TYPE_MODE_TO_NAME, LabelTypeMode, NewLabelItem, NewLabelType} from "../common/CommonTypes";
 import {useState} from "react";
 import {InputField} from "../common/CommonInput";
 
@@ -9,13 +9,6 @@ export interface Props {
     openModal?: () => void;
     closeModal: () => void;
 }
-
-const LABEL_TYPE_MODE_TO_NAME = new Map<LabelTypeMode, string>([
-    ['TEXT', "Text"],
-    ['NUMBER', "Number"],
-    ['SINGLETON', "Singleton"],
-    ['ONE_FOR_EACH_PLAYER', "One for Each"],
-]);
 
 interface ModeSelectorProps {
     selected: LabelTypeMode;

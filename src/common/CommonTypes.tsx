@@ -43,3 +43,12 @@ export interface LabelItem {
 export type LabelTypeIndex = Map<LabelTypeId, LabelType>;
 export type LabelItemMap = Map<LabelItemId, LabelItem>
 export type LabelItemIndex = Map<LabelTypeId, LabelItemMap>;
+
+
+
+export const LABEL_TYPE_MODE_TO_NAME = new Map<LabelTypeMode, string>([
+    ['TEXT', "Text"],
+    ['NUMBER', "Number"],
+    ['SINGLETON', "Singleton"],
+    ['ONE_FOR_EACH_PLAYER', "One for Each"],
+]);

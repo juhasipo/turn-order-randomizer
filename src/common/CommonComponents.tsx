@@ -1,9 +1,12 @@
 import React, {useState} from "react";
 import './CommonComponent.scss'
 
+export type ModalStyle = 'is-info';
+
 export interface CollapseProps {
     title: string;
     subtitle?: string;
+    modalStyle?: ModalStyle;
     openByDefault?: boolean;
     children: React.ReactNode
     actions?: React.ReactNode
@@ -21,7 +24,7 @@ export const Collapse = (props: CollapseProps) => {
     }
 
     return (
-        <div className={"message"}>
+        <div className={"message " + props.modalStyle}>
             <div className={"message-header collapse-header"} onClick={toggle}>
                 <p>
                     <span className={"collapse-header-title"}>{props.title}</span>
