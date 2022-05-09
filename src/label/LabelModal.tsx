@@ -1,6 +1,6 @@
 import {LABEL_TYPE_MODE_TO_NAME, LabelTypeMode, NewLabelItem, NewLabelType} from "../common/CommonTypes";
 import {useState} from "react";
-import {InputField} from "../common/CommonInput";
+import {InputField, RemoveButton} from "../common/CommonInput";
 
 export interface Props {
     openButtonTitle?: string;
@@ -38,6 +38,7 @@ const ModeSelector = (props: ModeSelectorProps) => {
 interface LabelItemListProps {
     items: Array<string>;
     itemsChanged: (items: Array<string>) => void;
+    itemRemoved: (index: number) => void;
 }
 
 const StringItemList = (props: LabelItemListProps) => {
@@ -46,14 +47,24 @@ const StringItemList = (props: LabelItemListProps) => {
 
     const getItem = (itemName: string, index: number) => {
         return (
-            <InputField
-                value={itemName}
-                onValueChange={(value) => {
-                    const a = Array.from(items);
-                    a[index] = value;
-                    itemsChanged(a);
-                }}
-            />
+            <div className={"card"}>
+                <div className={"card-header"}>
+                    <div className={"card-header-title"}>
+                        <InputField
+                            key={'item-' + index}
+                            value={itemName}
+                            onValueChange={(value) => {
+                                const a = Array.from(items);
+                                a[index] = value;
+                                itemsChanged(a);
+                            }}
+                        />
+                    </div>
+                    <div className={"card-header-icon"}>
+                        <RemoveButton onClick={(e) => props.itemRemoved(index)}/>
+                    </div>
+                </div>
+            </div>
         );
     }
 
@@ -68,16 +79,22 @@ const StringItemList = (props: LabelItemListProps) => {
     }
 
     const itemAdded = (_: any) => {
-        const newItems = Array.from(items);
-        newItems.push(newItem);
-        itemsChanged(newItems);
-        setNewItem('');
+        if (isValid(newItem)) {
+            const newItems = Array.from(items);
+            newItems.push(newItem);
+            itemsChanged(newItems);
+            setNewItem('');
+        }
     }
 
     const handleKeyPress = (e: React.KeyboardEvent<any>) => {
         if (e.key === 'Enter') {
-            itemAdded(newItem);
+            itemAdded(e);
         }
+    }
+
+    const isValid = (value: string): boolean => {
+        return !!value && value.trim().length > 0;
     }
 
     return (
@@ -93,7 +110,13 @@ const StringItemList = (props: LabelItemListProps) => {
                     />
                 </div>
                 <div className={"control"}>
-                    <button className={"button"} onClick={(e) => itemAdded}>Add item</button>
+                    <button
+                        className={"button"}
+                        onClick={itemAdded}
+                        disabled={!isValid(newItem)}
+                    >
+                        Add item
+                    </button>
                 </div>
             </div>
             {getItems(items)}
@@ -232,12 +255,19 @@ export const NewLabelModal = (props: Props) => {
                                 <StringItemList
                                     itemsChanged={(items) => setItems(items)}
                                     items={items}
+                                    itemRemoved={(index) => {
+                                        console.log("Remove at index", index);
+                                        const itemsWithRemoved = Array.from(items);
+                                        itemsWithRemoved.splice(index, 1)
+                                        setItems(itemsWithRemoved);
+                                    }}
                                 />
                             )}
                             {labelMode === 'NUMBER' && (
                                 <NumberItemList
                                     itemsChanged={(items) => setItems(items)}
                                     items={items}
+                                    itemRemoved={(itemIndex) => {}}
                                 />
                             )}
                         </section>
