@@ -15,6 +15,7 @@ import {
 } from "./common/CommonTypes";
 import LabelTypeList from "./label/LabelList";
 import {Collapse} from "./common/CommonComponents";
+import {NewLabelModal} from "./label/LabelModal";
 
 const defaultPlayers: PlayerIndex = new Map<PlayerId, Player>();
 
@@ -29,16 +30,24 @@ const shuffle = (array: Array<number>): Array<number> => {
     return shuffled;
 };
 
+let idPool = 0;
+const incrementId = () => {
+    idPool++;
+}
+
 const App = () => {
 
     const [players, setPlayers] = React.useState<PlayerIndex>(defaultPlayers);
-    const [idPool, setIdPool] = React.useState<PlayerId>(1);
     const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>([]);
     const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(new Map());
     const [labelItems, setLabelItems] = React.useState<LabelItemIndex>(new Map());
+    const [labelModalOpen, setLabelModalOpen] = React.useState<boolean>(false);
 
-    const incrementId = () => {
-        setIdPool(idPool + 1);
+    const openLabelModal = () => {
+        setLabelModalOpen(true);
+    }
+    const closeLabelModal = () => {
+        setLabelModalOpen(false);
     }
 
     const resetPlayerOrder = () => {
@@ -61,22 +70,17 @@ const App = () => {
                     return {...labelItem}
                 }));
             }
-        })
-        console.log('labelsToRandomize');
-        console.dir(labelsToRandomize);
+        });
 
         // 2. For each player, clear all non-fixed labels
         const newPlayers = new Map(players);
         Array.from(newPlayers).forEach(([id, player]) => {
             player.labels = new Map<LabelTypeId, PlayerLabel>();
-        })
-        console.log('newPlayers');
-        console.dir(newPlayers);
+        });
 
         const playerPool = Array.from(newPlayers).map(([id, player]) => {
             return id;
         });
-        console.log('Player process order' + playerPool);
 
         // 3. For each label type, set random labels and remove from the list
         labelsToRandomize.forEach((items, typeId) => {
@@ -128,6 +132,16 @@ const App = () => {
         };
         setLabelTypes(new Map(labelTypes.set(newLabel.id, newLabel)));
         incrementId();
+        return newLabel;
+    }
+
+    const labelAdded = (label: NewLabelType, items: Array<NewLabelItem>) => {
+        const type = labelTypeAdded(label);
+        items.forEach((item) => {
+            item.labelType = type.id
+        });
+        labelItemsAdded(items);
+
     }
 
     const labelTypeRemoved = (id: LabelTypeId) => {
@@ -136,32 +150,46 @@ const App = () => {
         setLabelTypes(withRemoved);
     }
 
-    const labelItemAdded = (labelItem: NewLabelItem) => {
-        const newLabelItem = {
-            id: idPool,
-            ...labelItem
-        };
-        const label = labelTypes.get(labelItem.labelType);
-
-        console.log(`Label item ${labelItem.name} added to type ${label?.name}`)
+    const labelItemsAdded = (labelItemsToAdd: Array<NewLabelItem>) => {
         const newItems = new Map(labelItems);
-        let itemsForLabel = newItems.get(labelItem.labelType);
-        if (itemsForLabel) {
-            itemsForLabel.set(newLabelItem.id, newLabelItem)
-        } else {
-            const newMap = new Map();
-            newMap.set(newLabelItem.id, newLabelItem);
-            newItems.set(labelItem.labelType, newMap);
-        }
+        labelItemsToAdd.forEach((labelItem) => {
+            const newLabelItem = {
+                id: idPool,
+                ...labelItem
+            };
+            incrementId();
+            const label = labelTypes.get(labelItem.labelType);
+
+            console.log(`Label item ${labelItem.name} added to type ${label?.name}`)
+
+            let itemsForLabel = newItems.get(labelItem.labelType);
+            if (itemsForLabel) {
+                itemsForLabel.set(newLabelItem.id, newLabelItem)
+            } else {
+                const newMap = new Map();
+                newMap.set(newLabelItem.id, newLabelItem);
+                newItems.set(labelItem.labelType, newMap);
+            }
+            console.dir(newItems);
+        });
 
         setLabelItems(newItems);
-        incrementId();
+    }
+
+    const labelItemAdded = (labelItem: NewLabelItem) => {
+        labelItemsAdded([labelItem]);
     }
 
     const labelItemRemoved = (typeId: LabelTypeId, itemId: LabelItemId) => {
         const withRemoved = new Map(labelItems);
         withRemoved.get(typeId)?.delete(itemId);
         setLabelItems(withRemoved);
+    }
+
+    const labelItemChanged = (typeId: LabelTypeId, item: LabelItem) => {
+        const withChanged = new Map(labelItems);
+        withChanged.get(typeId)?.set(item.id, {...item});
+        setLabelItems(withChanged);
     }
 
     return (
@@ -178,12 +206,21 @@ const App = () => {
                         title={"Labels"}
                         subtitle={`${labelTypes.size} label types`}
                     >
+                        <NewLabelModal
+                            openButtonTitle={"Add Label"}
+                            open={labelModalOpen}
+                            labelAdded={labelAdded}
+                            openModal={openLabelModal}
+                            closeModal={closeLabelModal}
+                        />
+                        <div className={"block"}/>
                         <LabelTypeList
                             labelTypeAdded={labelTypeAdded}
                             labelTypeRemoved={labelTypeRemoved}
 
                             labelItemAdded={labelItemAdded}
                             labelItemRemoved={labelItemRemoved}
+                            labelItemChanged={labelItemChanged}
 
                             labels={labelTypes}
                             labelItems={labelItems}
