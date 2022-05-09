@@ -244,6 +244,15 @@ const App = () => {
             <main className={"section"}>
                 <div className={"container"}>
                     <Collapse
+                        title={"Players"}
+                        subtitle={`${players.size} players`}
+                    >
+                        <PlayerList
+                            playerAdded={playerAdded}
+                            playerRemoved={playerRemoved}
+                            players={players}/>
+                    </Collapse>
+                    <Collapse
                         title={"Labels"}
                         subtitle={`${labelTypes.size} label types`}
                     >
@@ -266,15 +275,6 @@ const App = () => {
                             labels={labelTypes}
                             labelItems={labelItems}
                         />
-                    </Collapse>
-                    <Collapse
-                        title={"Players"}
-                        subtitle={`${players.size} players`}
-                    >
-                        <PlayerList
-                            playerAdded={playerAdded}
-                            playerRemoved={playerRemoved}
-                            players={players}/>
                     </Collapse>
                     <Table
                         players={players}
