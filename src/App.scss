@@ -25,6 +25,33 @@ header.navbar {
   }
 }
 
+.link-container.navbar {
+  padding: 10px 10px;
+  background-color: #3d4251;
+  height: 60px;
+  display: flex;
+
+  .link {
+    vertical-align: middle;
+    margin-left: 10px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 30px;
+    height: 40px;
+    width: 100%;
+    background-color: #282c34;
+    border-radius: 5px;
+    padding: 5px 10px;
+
+    a {
+      color: #5e79ef;
+      &:hover {
+        color: white;
+      }
+    }
+  }
+}
+
 main {
   padding-top: 50px;
   width: $layout_width;

@@ -269,6 +269,7 @@ const App = () => {
         setPlayers(new Map(players.set(newPlayer.id, newPlayer)));
         incrementId();
         resetPlayerOrder();
+        setLink('');
     }
 
     const playerRemoved = (id: PlayerId) => {
@@ -276,6 +277,7 @@ const App = () => {
         withRemoved.delete(id)
         setPlayers(withRemoved);
         resetPlayerOrder();
+        setLink('');
     }
 
     const labelTypeAdded = (label: NewLabelType) => {
@@ -285,6 +287,7 @@ const App = () => {
         };
         setLabelTypes(new Map(labelTypes.set(newLabel.id, newLabel)));
         incrementId();
+        setLink('');
         return newLabel;
     }
 
@@ -294,6 +297,7 @@ const App = () => {
             item.labelType = type.id
         });
         labelItemsAdded(items);
+        setLink('');
 
     }
 
@@ -301,6 +305,7 @@ const App = () => {
         const withRemoved = new Map(labelTypes);
         withRemoved.delete(id)
         setLabelTypes(withRemoved);
+        setLink('');
     }
 
     const labelItemsAdded = (labelItemsToAdd: Array<NewLabelItem>) => {
@@ -321,22 +326,26 @@ const App = () => {
         });
 
         setLabelItems(newItems);
+        setLink('');
     }
 
     const labelItemAdded = (labelItem: NewLabelItem) => {
         labelItemsAdded([labelItem]);
+        setLink('');
     }
 
     const labelItemRemoved = (typeId: LabelTypeId, itemId: LabelItemId) => {
         const withRemoved = new Map(labelItems);
         withRemoved.delete(itemId);
         setLabelItems(withRemoved);
+        setLink('');
     }
 
     const labelItemChanged = (typeId: LabelTypeId, item: LabelItem) => {
         const withChanged = new Map(labelItems);
         withChanged.set(item.id, {...item});
         setLabelItems(withChanged);
+        setLink('');
     }
 
     return (
@@ -344,18 +353,20 @@ const App = () => {
             <header className="App-header navbar">
                 <div className="App-header-container">
                     <h1>Turn Order Randomizer</h1>
-                    <sub>2.0.0</sub>
-                    <sub>
-                        {!!link && <a href={link}>{link}</a>}
-                        <button
-                            className={"button is-link"}
-                            onClick={(e) => setLink(generateLink(generateStatusAsBase64()))}
-                        >
-                            Generate Link
-                        </button>
-                    </sub>
+                    <sub>2.0.0-alpha</sub>
                 </div>
             </header>
+            <section className={"link-container navbar"}>
+                <button
+                    className={"button is-link"}
+                    onClick={(e) => setLink(generateLink(generateStatusAsBase64()))}
+                >
+                    Generate Link
+                </button>
+                <div className={"link"}>
+                    {!!link && <a href={link}>{link}</a>}
+                </div>
+            </section>
             <main className={"section"}>
                 <div className={"container"}>
                     <Collapse
