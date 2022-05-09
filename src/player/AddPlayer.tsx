@@ -20,6 +20,8 @@ const AddPlayer = (props: Props) => {
         props.playerAdded({
             name: name,
         });
+        setName('');
+        document.getElementById("add-player-input")?.focus();
     };
 
     const isValid = (): boolean => {
@@ -31,6 +33,7 @@ const AddPlayer = (props: Props) => {
         <div className={"field has-addons"}>
             <div className={"control"}>
                 <input
+                    id={"add-player-input"}
                     className={"input"}
                     type={"text"}
                     name={"name"}
