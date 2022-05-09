@@ -12,6 +12,7 @@ import {
 } from "../common/CommonTypes";
 import {PrimaryButton, SecondaryButton} from "../common/CommonInput";
 import './Table.scss'
+import {Collapse} from "../common/CommonComponents";
 
 export interface Props {
     players: PlayerIndex;
@@ -68,16 +69,18 @@ export default class Table extends React.Component<Props, any> {
     getPlayerItem = (player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
         if (player) {
             return (
-                <li key={player.name}>
-                    <span className={"player-name"}>
-                        {player.name}
-                    </span>
-                    <PlayerLabels
-                        labels={player.labels}
-                        labelTypes={labelTypes}
-                        labelItems={labelItems}
-                    />
-                </li>
+                <div key={player.name} className={"card"}>
+                    <header className={"card-header"}>
+                        <p className={"card-header-title"}>{player.name}</p>
+                    </header>
+                    <div className={"card-content"}>
+                        <PlayerLabels
+                            labels={player.labels}
+                            labelTypes={labelTypes}
+                            labelItems={labelItems}
+                        />
+                    </div>
+                </div>
             )
         } else {
             return (<></>)
@@ -90,11 +93,18 @@ export default class Table extends React.Component<Props, any> {
 
     render() {
         return (
-            <div className={'table'}>
-                <PrimaryButton onClick={this.props.randomizePlayers}>Randomize Turn Order</PrimaryButton>
-                <SecondaryButton onClick={this.props.randomizeLabels}>Randomize Labels</SecondaryButton>
-                <ol>{this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems)}</ol>
-            </div>
+            <Collapse
+                title={"Results"}
+                openByDefault={true}
+                actions={(
+                    <>
+                        <PrimaryButton onClick={this.props.randomizePlayers}>Randomize Turn Order</PrimaryButton>
+                        <SecondaryButton onClick={this.props.randomizeLabels}>Randomize Labels</SecondaryButton>
+                    </>
+                )}
+            >
+                <div className={"player-cards"}>{this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems)}</div>
+            </Collapse>
         );
     }
 }

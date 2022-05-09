@@ -4,29 +4,40 @@ import './CommonComponent.scss'
 export interface CollapseProps {
     title: string;
     subtitle?: string;
+    openByDefault?: boolean;
     children: React.ReactNode
+    actions?: React.ReactNode
 }
 
 export const Collapse = (props: CollapseProps) => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(!!props.openByDefault);
 
     const toggle = () => {
         setOpen(!open);
     }
 
     const getChildrenClass = (open: boolean) => {
-        return "collapse-children" + (open ? ' open' : ' closed');
+        return "" + (open ? ' message-body' : ' ');
     }
 
     return (
-        <div className={"collapse"}>
-            <div className={"collapse-header"}>
-                <span className={"collapse-header-title"}>{props.title}</span>
-                <span className={"collapse-header-subtitle"}>{props.subtitle}</span>
+        <div className={"message"}>
+            <div className={"message-header"}>
+                <p>
+                    <span className={"collapse-header-title"}>{props.title}</span>
+                    <span className={"collapse-header-subtitle"}>{props.subtitle}</span>
+                </p>
                 <button onClick={toggle}>{open ? 'V' : '>'}</button>
             </div>
             <div className={getChildrenClass(open)}>
-                {open && props.children}
+                <div className={"block"}>
+                    {open && props.children}
+                </div>
+                {props.actions && (
+                    <div className={"block"}>
+                        {open && props.actions && props.actions}
+                    </div>
+                )}
             </div>
         </div>
     )

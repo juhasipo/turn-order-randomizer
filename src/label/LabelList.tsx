@@ -5,7 +5,7 @@ import {
     NewLabelType,
     LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItemMap, LabelItem
 } from "../common/CommonTypes";
-import {PrimaryButton, RemoveButton} from "../common/CommonInput";
+import {SecondaryButton, RemoveButton} from "../common/CommonInput";
 import {AddLabelType, AddLabelItem} from "./AddLabel";
 
 export interface Props {
@@ -36,12 +36,14 @@ export default class LabelTypeList extends React.Component<Props, any> {
 
     getLabelItem = (labelTypeId: LabelTypeId, labelItem: LabelItem) => {
         return (
-            <li key={labelItem.id} className={"label-item"}>
-                <span>Item: {labelItem.name}</span>
-                <span className={"actions"}>
-                <RemoveButton onClick={(e) => this.props.labelItemRemoved(labelTypeId, labelItem.id)}/>
-            </span>
-            </li>
+            <div key={labelItem.id} className={"card"}>
+                <div className={"card-header"}>
+                    <div className={"card-header-title"}>{labelItem.name}</div>
+                    <div className={"card-header-icon"}>
+                        <RemoveButton onClick={(e) => this.props.labelItemRemoved(labelTypeId, labelItem.id)}/>
+                    </div>
+                </div>
+            </div>
         )
     }
 
@@ -55,21 +57,27 @@ export default class LabelTypeList extends React.Component<Props, any> {
 
     getLabelTypeItem = (label: LabelType, labelItems: LabelItemIndex) => {
         return (
-            <li key={label.name} className={"label-type"}>
-                <span>Label type: {label.name}</span>
-                <span className={"actions"}>
-                    <RemoveButton onClick={(e) => this.props.labelTypeRemoved(label.id)}/>
-                </span>
-                <ol className={"label-items"}>
-                    <li>
-                        <AddLabelItem
-                            labelTypeId={label.id}
-                            labelItemAdded={this.props.labelItemAdded}
-                        />
-                    </li>
-                    {this.getLabelItems(label.id, labelItems.get(label.id) || new Map())}
-                </ol>
-            </li>
+            <div key={label.name} className={"panel is-info"}>
+                <div className={"panel-heading"}>
+                    <p>{label.name}</p>
+                </div>
+                <div className={"panel-block"}>
+                    <AddLabelItem
+                        labelTypeId={label.id}
+                        labelItemAdded={this.props.labelItemAdded}
+                    />
+                </div>
+                <div className={"panel-block"}>
+                    <div className={"label-items"}>
+                        {this.getLabelItems(label.id, labelItems.get(label.id) || new Map())}
+                    </div>
+                </div>
+                <div className={"panel-block"}>
+                    <SecondaryButton onClick={(e) => this.props.labelTypeRemoved(label.id)}>
+                        Remove Label Type
+                    </SecondaryButton>
+                </div>
+            </div>
         )
     }
 
@@ -84,9 +92,9 @@ export default class LabelTypeList extends React.Component<Props, any> {
         return (
             <div className={"PlayerList"}>
                 <AddLabelType labelAdded={this.props.labelTypeAdded}/>
-                <ol className={"label-types"}>
+                <div className={"label-types"}>
                     {this.getLabelTypeItems(this.props.labels, this.props.labelItems)}
-                </ol>
+                </div>
             </div>
         );
     }

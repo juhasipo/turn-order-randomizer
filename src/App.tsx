@@ -166,45 +166,47 @@ const App = () => {
 
     return (
         <div className="App">
-            <header className="App-header">
+            <header className="App-header navbar">
                 <div className="App-header-container">
                     <h1>Turn Order Randomizer</h1>
                     <sub>2.0.0</sub>
                 </div>
             </header>
-            <main>
-                <Collapse
-                    title={"Labels"}
-                    subtitle={`${labelTypes.size} label types`}
-                >
-                    <LabelTypeList
-                        labelTypeAdded={labelTypeAdded}
-                        labelTypeRemoved={labelTypeRemoved}
+            <main className={"section"}>
+                <div className={"container"}>
+                    <Collapse
+                        title={"Labels"}
+                        subtitle={`${labelTypes.size} label types`}
+                    >
+                        <LabelTypeList
+                            labelTypeAdded={labelTypeAdded}
+                            labelTypeRemoved={labelTypeRemoved}
 
-                        labelItemAdded={labelItemAdded}
-                        labelItemRemoved={labelItemRemoved}
+                            labelItemAdded={labelItemAdded}
+                            labelItemRemoved={labelItemRemoved}
 
-                        labels={labelTypes}
+                            labels={labelTypes}
+                            labelItems={labelItems}
+                        />
+                    </Collapse>
+                    <Collapse
+                        title={"Players"}
+                        subtitle={`${players.size} players`}
+                    >
+                        <PlayerList
+                            playerAdded={playerAdded}
+                            playerRemoved={playerRemoved}
+                            players={players}/>
+                    </Collapse>
+                    <Table
+                        players={players}
+                        playerOrder={playerOrder}
+                        randomizePlayers={randomizePlayers}
+                        randomizeLabels={randomizeLabels}
+                        labelTypes={labelTypes}
                         labelItems={labelItems}
                     />
-                </Collapse>
-                <Collapse
-                    title={"Players"}
-                    subtitle={`${players.size} players`}
-                >
-                    <PlayerList
-                        playerAdded={playerAdded}
-                        playerRemoved={playerRemoved}
-                        players={players}/>
-                </Collapse>
-                <Table
-                    players={players}
-                    playerOrder={playerOrder}
-                    randomizePlayers={randomizePlayers}
-                    randomizeLabels={randomizeLabels}
-                    labelTypes={labelTypes}
-                    labelItems={labelItems}
-                />
+                </div>
             </main>
         </div>
     );

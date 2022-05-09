@@ -3,17 +3,18 @@ import './CommonInput.scss'
 
 export const PrimaryButton = (props: React.ButtonHTMLAttributes<{}>) => {
     return (
-        <button className={"primary-button"} {...props}>{props.children}</button>
+        <button className={"button is-primary"} {...props}>{props.children}</button>
     )
 }
+
 export const SecondaryButton = (props: React.ButtonHTMLAttributes<{}>) => {
     return (
-        <button className={"secondary-button"} {...props}>{props.children}</button>
+        <button className={"button"} {...props}>{props.children}</button>
     )
 }
 
 export const RemoveButton = (props: React.ButtonHTMLAttributes<{}>) => {
     return (
-        <button className={"remove-button"} {...props}>X</button>
+        <button className={"delete is-danger"} {...props}>X</button>
     )
 }

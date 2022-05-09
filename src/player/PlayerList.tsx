@@ -28,12 +28,14 @@ export default class PlayerList extends React.Component<Props, any> {
 
     getPlayerItem = (player: Player) => {
         return (
-            <li key={player.name}>
-                <span>{player.name}</span>
-                <span className={"actions"}>
-                    <RemoveButton onClick={(e) => this.props.playerRemoved(player.id)}/>
-                </span>
-            </li>
+            <div key={player.name} className={"card"}>
+                <div className={"card-header"}>
+                    <div className={"card-header-title"}>{player.name}</div>
+                    <div className={"card-header-icon"}>
+                        <RemoveButton onClick={(e) => this.props.playerRemoved(player.id)}/>
+                    </div>
+                </div>
+            </div>
         )
     }
 

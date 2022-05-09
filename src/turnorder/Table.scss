@@ -13,3 +13,14 @@
 .label-item-name {
   margin-left: 15px;
 }
+
+.player-cards {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+
+  .card {
+    width: 45%;
+    margin: 5px;
+  }
+}

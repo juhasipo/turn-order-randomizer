@@ -13,15 +13,23 @@ const AddLabelType = (props: TypeProps) => {
         props.labelAdded({
             name: name,
         });
+        setName('');
     };
 
     return (
-        <div>
-            <label>
-                Label:
-                <input type={"text"} name={"name"} onChange={(event) => setName(event.target.value)}/>
-            </label>
-            <PrimaryButton onClick={addPlayer}>Add</PrimaryButton>
+        <div className={"field has-addons"}>
+            <div className={"control"}>
+                <input
+                    className={"input"}
+                    type={"text"}
+                    name={"name"}
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                />
+            </div>
+            <div className={"control"}>
+                <PrimaryButton onClick={addPlayer}>Text</PrimaryButton>
+            </div>
         </div>
     );
 }
@@ -40,15 +48,23 @@ const AddLabelItem = (props: ItemProps) => {
             labelType: props.labelTypeId,
             name: name,
         });
+        setName('');
     };
 
     return (
-        <div>
-            <label>
-                Item:
-                <input type={"text"} name={"name"} onChange={(event) => setName(event.target.value)}/>
-            </label>
-            <PrimaryButton onClick={addLabelItem}>Add</PrimaryButton>
+        <div className={"field has-addons"}>
+            <div className={"control"}>
+                <input
+                    className={"input"}
+                    type={"text"}
+                    name={"name"}
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                />
+            </div>
+            <div className={"control"}>
+                <PrimaryButton onClick={addLabelItem}>Add</PrimaryButton>
+            </div>
         </div>
     );
 }

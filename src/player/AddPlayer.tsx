@@ -16,12 +16,20 @@ const AddPlayer = (props: Props) => {
     };
 
     return (
-        <div>
-            <label>
-                Player:
-                <input type={"text"} name={"name"} onChange={(event) => setName(event.target.value)}/>
-            </label>
-            <PrimaryButton onClick={addPlayer}>Add</PrimaryButton>
+
+        <div className={"field has-addons"}>
+            <div className={"control"}>
+                <input
+                    className={"input"}
+                    type={"text"}
+                    name={"name"}
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                />
+            </div>
+            <div className={"control"}>
+                <PrimaryButton onClick={addPlayer}>Add</PrimaryButton>
+            </div>
         </div>
     );
 }
