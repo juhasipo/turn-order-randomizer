@@ -22,12 +22,14 @@ export const Collapse = (props: CollapseProps) => {
 
     return (
         <div className={"message"}>
-            <div className={"message-header"}>
+            <div className={"message-header collapse-header"} onClick={toggle}>
                 <p>
                     <span className={"collapse-header-title"}>{props.title}</span>
                     <span className={"collapse-header-subtitle"}>{props.subtitle}</span>
                 </p>
-                <button onClick={toggle}>{open ? 'V' : '>'}</button>
+                <div className={"buttons are-small"}>
+                    <button className={"button is-rounded"} onClick={toggle}>{open ? 'V' : '>'}</button>
+                </div>
             </div>
             <div className={getChildrenClass(open)}>
                 <div className={"block"}>
