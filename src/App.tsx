@@ -4,7 +4,7 @@ import PlayerList from './player//PlayerList'
 import './App.scss';
 import {
     LabelItem,
-    LabelItemId, LabelItemIndex,
+    LabelItemId, LabelItemIndex, LabelType,
     LabelTypeId,
     LabelTypeIndex, NewLabelItem,
     NewLabelType,
@@ -16,8 +16,6 @@ import {
 import LabelTypeList from "./label/LabelList";
 import {Collapse} from "./common/CommonComponents";
 import {NewLabelModal} from "./label/LabelModal";
-
-const defaultPlayers: PlayerIndex = new Map<PlayerId, Player>();
 
 const shuffle = (array: Array<number>): Array<number> => {
     const shuffled = Array.from(array);
@@ -36,13 +34,116 @@ const incrementId = (): number => {
     return idPool;
 }
 
+interface Status {
+    players: PlayerIndex;
+    labelTypes: LabelTypeIndex;
+    labelItems: LabelItemIndex;
+    playerOrder: Array<PlayerId>;
+    idPool: number;
+}
+
+let status: Status = {
+    idPool: 0,
+    players: new Map<PlayerId, Player>(),
+    labelTypes: new Map<LabelTypeId, LabelType>(),
+    labelItems: new Map<LabelTypeId, LabelItem>(),
+    playerOrder: new Array<PlayerId>(),
+};
+
+const isValueObject = (value: any): boolean => {
+    return value !== null && typeof value === 'object';
+}
+
+const toMap = (obj: any): Map<any, any> => {
+    console.log("Convert object", obj, "to map");
+    const m = new Map();
+    for (let objKey in obj) {
+        const value = obj[objKey];
+        const parsedKey = parseInt(objKey);
+        const key = Number.isInteger(parsedKey) ? parsedKey : objKey;
+
+        console.log("Key:",
+            key, typeof key,
+            objKey, typeof objKey
+        );
+
+        if (isValueObject(value)) {
+            console.log("Convert value to map", key, value);
+            m.set(key, value);
+        } else if (Array.isArray(value)) {
+            console.log("Convert value to array", key, value);
+            m.set(key, Array.from(value));
+        } else {
+            console.log("Assign value", key, value);
+            m.set(key, value);
+        }
+    }
+    return m;
+}
+
+const toObject = (map: Map<any, any>): any => {
+    return Object.fromEntries(Array.from(map.entries(), ([k, v]) => {
+        if (v instanceof Array) {
+            return [k, v.map(toObject)];
+        } else if (v instanceof Map) {
+            return [k, toObject(v)];
+        } else {
+            return [k, v];
+        }
+    }));
+}
+
+const fragment = window.location.hash;
+if (fragment) {
+    try {
+        const statusBase64 = fragment.substring(1);
+        console.log("Restore from fragment", statusBase64);
+        const jsonStatus = JSON.parse(window.atob(statusBase64));
+        console.log("JSON value", jsonStatus);
+
+        const m = new Map();
+        for (var value in jsonStatus) {
+            m.set(value, new Map(Object.entries(jsonStatus[value])));
+        }
+        status = {
+            players: toMap(jsonStatus["players"]),
+            labelTypes: toMap(jsonStatus["labelTypes"]),
+            labelItems: toMap(jsonStatus["labelItems"]),
+            playerOrder: Array.from(jsonStatus["playerOrder"]),
+            idPool: jsonStatus["idPool"],
+        };
+        console.log("Restored status", status);
+        idPool = status.idPool;
+    } finally {
+        window.location.hash = '';
+    }
+}
+
 const App = () => {
 
-    const [players, setPlayers] = React.useState<PlayerIndex>(defaultPlayers);
-    const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>([]);
-    const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(new Map());
-    const [labelItems, setLabelItems] = React.useState<LabelItemIndex>(new Map());
+    console.dir('Status');
+    console.dir(status);
+    const [players, setPlayers] = React.useState<PlayerIndex>(status.players);
+    const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>(status.playerOrder);
+    const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(status.labelTypes);
+    const [labelItems, setLabelItems] = React.useState<LabelItemIndex>(status.labelItems);
     const [labelModalOpen, setLabelModalOpen] = React.useState<boolean>(false);
+
+    const logStatusAsBase64 = () => {
+        const status = {
+            players: toObject(players),
+            labelTypes: toObject(labelTypes),
+            labelItems: toObject(labelItems),
+            playerOrder: Array.from(playerOrder),
+            idPool: idPool,
+        };
+
+        console.log(status);
+        const statusJson = JSON.stringify(status);
+        const statusBase64 = window.btoa(statusJson);
+        console.log("Status: " + statusJson);
+        console.log("Status: " + statusBase64);
+    };
 
     const openLabelModal = () => {
         setLabelModalOpen(true);
@@ -68,14 +169,7 @@ const App = () => {
             const type = labelTypes.get(typeId);
             if (type && (type.mode === "TEXT" || type.mode === "NUMBER")) {
                 console.log("Add static items", typeId);
-                newLabelItems.set(typeId, new Map<LabelItemId, LabelItem>(Array.from(itemMap)
-                    .map(([itemId, item]) => {
-                        return [itemId, item];
-                    })
-                ))
-            } else {
-                console.log("Clean dynamic type", typeId);
-                newLabelItems.set(typeId, new Map());
+                labelItems.set(itemMap.id, itemMap);
             }
         });
         Array.from(labelTypes).forEach(([typeId, _]) => {
@@ -88,28 +182,43 @@ const App = () => {
         // 1. For each label type, make a list of labels to add
         const labelsToRandomize: Map<LabelTypeId, Array<LabelItem>> = new Map();
         labelTypes.forEach(type => {
-            console.log(`Label type: ${type.name}; ${type.mode}`)
-            const items = labelItems.get(type.id);
+            console.log(`Label type: ${type.id}; ${type.name}; ${type.mode}`)
             if (type.mode === "TEXT" || type.mode === "NUMBER") {
-                labelsToRandomize.set(type.id, Array.from(items || []).map(([_, labelItem]) => {
-                    return {...labelItem}
-                }));
+                const ii = Array.from(labelItems)
+                    .filter(([_, labelItem]) => labelItem.typeId === type.id)
+                    .map(([_, labelItem]) => {
+                        return {...labelItem}
+                    });
+                ii.forEach(item =>
+                    newLabelItems.set(item.id, item)
+                );
+                labelsToRandomize.set(type.id, ii);
             } else if (type.mode === "SINGLETON") {
-                const dynamicItems = [{id: incrementId(), name: type.name}];
-                dynamicItems.forEach(ii => {
-                    newLabelItems.get(type.id)?.set(ii.id, ii);
-                })
+                const dynamicItems = [{
+                    id: incrementId(),
+                    name: type.name,
+                    typeId: type.id
+                }];
+                dynamicItems.forEach(item => {
+                    newLabelItems.set(item.id, item);
+                });
                 labelsToRandomize.set(type.id, dynamicItems);
             } else if (type.mode === "ONE_FOR_EACH_PLAYER") {
                 const dynamicItems = Array.from(players).map(([_], index) => {
-                    return {id: incrementId(), name: '' + (index + 1)}
+                    return {
+                        id: incrementId(),
+                        name: '' + (index + 1),
+                        typeId: type.id,
+                    }
                 });
-                dynamicItems.forEach(ii => {
-                    newLabelItems.get(type.id)?.set(ii.id, ii);
-                })
+                dynamicItems.forEach(item => {
+                    newLabelItems.set(item.id, item);
+                });
                 labelsToRandomize.set(type.id, dynamicItems);
             }
         });
+
+        console.log("labelsToRandomize", labelsToRandomize);
 
         // 2. For each player, clear all non-fixed labels
         const newPlayers = new Map(players);
@@ -192,25 +301,19 @@ const App = () => {
     }
 
     const labelItemsAdded = (labelItemsToAdd: Array<NewLabelItem>) => {
-        const newItems = new Map(labelItems);
+        const newItems = new Map<LabelItemId, LabelItem>(labelItems);
         labelItemsToAdd.forEach((labelItem) => {
-            const newLabelItem = {
+            const newLabelItem: LabelItem = {
                 id: idPool,
-                ...labelItem
+                typeId: labelItem.labelType,
+                name: labelItem.name,
             };
             incrementId();
             const label = labelTypes.get(labelItem.labelType);
 
             console.log(`Label item ${labelItem.name} added to type ${label?.name}`)
 
-            let itemsForLabel = newItems.get(labelItem.labelType);
-            if (itemsForLabel) {
-                itemsForLabel.set(newLabelItem.id, newLabelItem)
-            } else {
-                const newMap = new Map();
-                newMap.set(newLabelItem.id, newLabelItem);
-                newItems.set(labelItem.labelType, newMap);
-            }
+            newItems.set(newLabelItem.id, newLabelItem);
             console.dir(newItems);
         });
 
@@ -223,13 +326,13 @@ const App = () => {
 
     const labelItemRemoved = (typeId: LabelTypeId, itemId: LabelItemId) => {
         const withRemoved = new Map(labelItems);
-        withRemoved.get(typeId)?.delete(itemId);
+        withRemoved.delete(itemId);
         setLabelItems(withRemoved);
     }
 
     const labelItemChanged = (typeId: LabelTypeId, item: LabelItem) => {
         const withChanged = new Map(labelItems);
-        withChanged.get(typeId)?.set(item.id, {...item});
+        withChanged.set(item.id, {...item});
         setLabelItems(withChanged);
     }
 
@@ -237,7 +340,7 @@ const App = () => {
         <div className="App">
             <header className="App-header navbar">
                 <div className="App-header-container">
-                    <h1>Turn Order Randomizer</h1>
+                    <h1 onClick={(e) => logStatusAsBase64()}>Turn Order Randomizer</h1>
                     <sub>2.0.0</sub>
                 </div>
             </header>

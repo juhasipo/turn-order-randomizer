@@ -60,7 +60,7 @@ const PlayerLabels = (props: PlayerLabelProps) => {
         const p = props;
         return Array.from(props.labels).map(([id, playerLabel]) => {
             const type = p.labelTypes.get(playerLabel.typeId);
-            const item = p.labelItems.get(playerLabel.typeId)?.get(playerLabel.itemId);
+            const item = p.labelItems.get(playerLabel.itemId);
 
             if (type && item) {
                 return getLabel(type, item);
@@ -94,7 +94,7 @@ export default class Table extends React.Component<Props, any> {
     getPlayerItem = (order: number, player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
         if (player) {
             return (
-                <div key={player.name} className={"card"}>
+                <div key={'player-' + player.id} className={"card"}>
                     <header className={"card-header"}>
                         <p className={"card-header-title"}>
                             <span className={"player-order-no"}>{order}</span>
@@ -118,7 +118,9 @@ export default class Table extends React.Component<Props, any> {
     }
 
     getPlayerItems = (players: PlayerIndex, playerOrder: Array<PlayerId>, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
-        return playerOrder.map((id, index) => this.getPlayerItem(index + 1, players.get(id), labelTypes, labelItems));
+        return playerOrder.map((id, index) => {
+            return this.getPlayerItem(index + 1, players.get(id), labelTypes, labelItems)
+        });
     }
 
     render() {
@@ -133,7 +135,9 @@ export default class Table extends React.Component<Props, any> {
                     </>
                 )}
             >
-                <div className={"player-cards"}>{this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems)}</div>
+                <div className={"player-cards"}>
+                    {this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems)}
+                </div>
             </Collapse>
         );
     }

@@ -38,12 +38,11 @@ export interface NewLabelItem {
 
 export interface LabelItem {
     id: LabelItemId;
+    typeId: LabelTypeId;
     name: string;
 }
 export type LabelTypeIndex = Map<LabelTypeId, LabelType>;
-export type LabelItemMap = Map<LabelItemId, LabelItem>
-export type LabelItemIndex = Map<LabelTypeId, LabelItemMap>;
-
+export type LabelItemIndex = Map<LabelItemId, LabelItem>
 
 
 export const LABEL_TYPE_MODE_TO_NAME = new Map<LabelTypeMode, string>([

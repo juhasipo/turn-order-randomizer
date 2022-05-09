@@ -3,7 +3,7 @@ import {
     LabelTypeId,
     LabelTypeIndex,
     NewLabelType,
-    LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItemMap, LabelItem, LABEL_TYPE_MODE_TO_NAME
+    LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItem, LABEL_TYPE_MODE_TO_NAME
 } from "../common/CommonTypes";
 import {SecondaryButton, RemoveButton} from "../common/CommonInput";
 import {useState} from "react";
@@ -94,6 +94,7 @@ export default class LabelTypeList extends React.Component<Props, any> {
     getLabelItem = (labelTypeId: LabelTypeId, labelItem: LabelItem) => {
         return (
             <LabelItemEditor
+                key={"label-item-" + labelItem.id}
                 labelTypeId={labelTypeId}
                 labelItem={labelItem}
                 labelItemRemoved={this.props.labelItemRemoved}
@@ -102,10 +103,12 @@ export default class LabelTypeList extends React.Component<Props, any> {
         )
     }
 
-    getLabelItems = (labelTypeId: LabelTypeId, labelItems: LabelItemMap) => {
+    getLabelItems = (labelTypeId: LabelTypeId, labelItems: LabelItemIndex) => {
         return (
             <>
-                {Array.from(labelItems).map(([id, label]) => this.getLabelItem(labelTypeId, label))}
+                {Array.from(labelItems)
+                    .filter(([_, labelItem]) => labelItem.typeId === labelTypeId)
+                    .map(([id, label]) => this.getLabelItem(labelTypeId, label))}
             </>
         )
     }
@@ -113,14 +116,14 @@ export default class LabelTypeList extends React.Component<Props, any> {
     getLabelTypeItem = (label: LabelType, labelItems: LabelItemIndex) => {
         return (
             <Collapse
-                key={label.name}
+                key={'labe-l' + label.id}
                 title={label.name}
                 subtitle={LABEL_TYPE_MODE_TO_NAME.get(label.mode)}
                 modalStyle={"is-info"}
             >
                 <div className={"panel-block"}>
                     <div className={"label-items"}>
-                        {this.getLabelItems(label.id, labelItems.get(label.id) || new Map())}
+                        {this.getLabelItems(label.id, labelItems)}
                     </div>
                 </div>
                 <div className={"panel-block"}>
