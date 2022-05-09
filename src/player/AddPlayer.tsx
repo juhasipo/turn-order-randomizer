@@ -9,11 +9,22 @@ export interface Props {
 const AddPlayer = (props: Props) => {
     const [name, setName] = React.useState('');
 
+    const handleEnter = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && isValid()) {
+            addPlayer(e);
+            setName('');
+        }
+    }
+
     const addPlayer = (_: any) => {
         props.playerAdded({
             name: name,
         });
     };
+
+    const isValid = (): boolean => {
+        return !!name && name.trim().length > 0;
+    }
 
     return (
 
@@ -24,11 +35,15 @@ const AddPlayer = (props: Props) => {
                     type={"text"}
                     name={"name"}
                     value={name}
+                    onKeyPress={handleEnter}
                     onChange={(event) => setName(event.target.value)}
                 />
             </div>
             <div className={"control"}>
-                <PrimaryButton onClick={addPlayer}>Add</PrimaryButton>
+                <PrimaryButton
+                    onClick={addPlayer}
+                    disabled={!isValid()}
+                >Add</PrimaryButton>
             </div>
         </div>
     );
