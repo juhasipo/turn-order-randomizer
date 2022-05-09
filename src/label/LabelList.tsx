@@ -113,7 +113,7 @@ export default class LabelTypeList extends React.Component<Props, any> {
         return (
             <div key={label.name} className={"panel is-info"}>
                 <div className={"panel-heading"}>
-                    <p>{label.name}</p>
+                    <p>{label.name} {label.mode}</p>
                 </div>
                 <div className={"panel-block"}>
                     <div className={"label-items"}>

@@ -24,6 +24,7 @@ export interface Props {
 }
 
 export interface PlayerLabelProps {
+    player: Player|undefined;
     labels: Map<LabelTypeId, PlayerLabel>;
     labelTypes: LabelTypeIndex;
     labelItems: LabelItemIndex;
@@ -32,12 +33,27 @@ export interface PlayerLabelProps {
 const PlayerLabels = (props: PlayerLabelProps) => {
 
     const getLabel = (type: LabelType, item: LabelItem) => {
-        return (
-            <div key={type.id + '-' + item.id} className={"label-item"}>
-                <span className={"label-item-type"}>{type.name}</span>
-                <span className={"label-item-name"}>{item.name}</span>
-            </div>
-        )
+        if (type.mode === "TEXT" || type.mode === "NUMBER") {
+            return (
+                <div key={type.id + '-' + item.id} className={"label-item"}>
+                    <span className={"label-item-type"}>{type.name}</span>
+                    <span className={"label-item-name"}>{item.name}</span>
+                </div>
+            )
+        } else if (type.mode === "SINGLETON") {
+            return (
+                <div key={type.id + '-' + item.id} className={"label-item"}>
+                    <span className={"label-item-type"}>{type.name}</span>
+                </div>
+            )
+        } else if (type.mode === "ONE_FOR_EACH_PLAYER") {
+            return (
+                <div key={type.id + '-' + item.id} className={"label-item"}>
+                    <span className={"label-item-type"}>{type.name}</span>
+                    <span className={"label-item-name"}>{item.name}</span>
+                </div>
+            )
+        }
     }
 
     const getLabels = () => {
@@ -54,27 +70,41 @@ const PlayerLabels = (props: PlayerLabelProps) => {
         })
     }
 
-    return (
-        <div className={"player-labels"}>
-            {getLabels()}
-        </div>
-    )
+    const hasLabels = (labels: Map<LabelTypeId, PlayerLabel>) => {
+        return labels.size > 0;
+    }
+
+    if (hasLabels(props.labels)) {
+        return (
+            <div className={"player-labels"}>
+                {getLabels()}
+            </div>
+        )
+    } else {
+        return (
+            <div className={"player-labels"}>
+                <div className={"player-no-labels"}>No labels</div>
+            </div>
+        )
+    }
 }
 
 export default class Table extends React.Component<Props, any> {
-    constructor(props: Props) {
-        super(props);
-    }
 
-    getPlayerItem = (player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
+    getPlayerItem = (order: number, player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
         if (player) {
             return (
                 <div key={player.name} className={"card"}>
                     <header className={"card-header"}>
-                        <p className={"card-header-title"}>{player.name}</p>
+                        <p className={"card-header-title"}>
+                            <span className={"player-order-no"}>{order}</span>
+                            <span className={"player-order-separator"}>: </span>
+                            <span className={"player-name"}>{player.name}</span>
+                        </p>
                     </header>
                     <div className={"card-content"}>
                         <PlayerLabels
+                            player={player}
                             labels={player.labels}
                             labelTypes={labelTypes}
                             labelItems={labelItems}
@@ -88,7 +118,7 @@ export default class Table extends React.Component<Props, any> {
     }
 
     getPlayerItems = (players: PlayerIndex, playerOrder: Array<PlayerId>, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
-        return playerOrder.map(id => this.getPlayerItem(players.get(id), labelTypes, labelItems));
+        return playerOrder.map((id, index) => this.getPlayerItem(index + 1, players.get(id), labelTypes, labelItems));
     }
 
     render() {

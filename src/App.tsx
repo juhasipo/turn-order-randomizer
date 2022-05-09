@@ -31,8 +31,9 @@ const shuffle = (array: Array<number>): Array<number> => {
 };
 
 let idPool = 0;
-const incrementId = () => {
+const incrementId = (): number => {
     idPool++;
+    return idPool;
 }
 
 const App = () => {
@@ -56,19 +57,57 @@ const App = () => {
 
     const randomizePlayers = () => {
         resetPlayerOrder();
-        setPlayerOrder(shuffle(playerOrder));
+        const newOrder = shuffle(playerOrder);
+        setPlayerOrder(newOrder);
     }
 
     const randomizeLabels = () => {
-        // TODO: Implement
+        // 0. Generate index so that there are no dynamic items
+        const newLabelItems = new Map();
+        Array.from(labelItems).map(([typeId, itemMap]) => {
+            const type = labelTypes.get(typeId);
+            if (type && (type.mode === "TEXT" || type.mode === "NUMBER")) {
+                console.log("Add static items", typeId);
+                newLabelItems.set(typeId, new Map<LabelItemId, LabelItem>(Array.from(itemMap)
+                    .map(([itemId, item]) => {
+                        return [itemId, item];
+                    })
+                ))
+            } else {
+                console.log("Clean dynamic type", typeId);
+                newLabelItems.set(typeId, new Map());
+            }
+        });
+        Array.from(labelTypes).forEach(([typeId, _]) => {
+            if (!newLabelItems.get(typeId)) {
+                newLabelItems.set(typeId, new Map());
+            }
+        })
+        console.log("Cleaned items: ", newLabelItems);
+
         // 1. For each label type, make a list of labels to add
         const labelsToRandomize: Map<LabelTypeId, Array<LabelItem>> = new Map();
         labelTypes.forEach(type => {
+            console.log(`Label type: ${type.name}; ${type.mode}`)
             const items = labelItems.get(type.id);
-            if (items) {
-                labelsToRandomize.set(type.id, Array.from(items).map(([itemId, labelItem]) => {
+            if (type.mode === "TEXT" || type.mode === "NUMBER") {
+                labelsToRandomize.set(type.id, Array.from(items || []).map(([_, labelItem]) => {
                     return {...labelItem}
                 }));
+            } else if (type.mode === "SINGLETON") {
+                const dynamicItems = [{id: incrementId(), name: type.name}];
+                dynamicItems.forEach(ii => {
+                    newLabelItems.get(type.id)?.set(ii.id, ii);
+                })
+                labelsToRandomize.set(type.id, dynamicItems);
+            } else if (type.mode === "ONE_FOR_EACH_PLAYER") {
+                const dynamicItems = Array.from(players).map(([_], index) => {
+                    return {id: incrementId(), name: '' + (index + 1)}
+                });
+                dynamicItems.forEach(ii => {
+                    newLabelItems.get(type.id)?.set(ii.id, ii);
+                })
+                labelsToRandomize.set(type.id, dynamicItems);
             }
         });
 
@@ -95,7 +134,7 @@ const App = () => {
                     const randomLabelItem = items[randomIndex];
                     items.splice(randomIndex, 1)
                     const playerLabel: PlayerLabel = {
-                        fixed: false,
+                        dynamic: false,
                         itemId: randomLabelItem.id,
                         typeId: typeId,
                     }
@@ -104,6 +143,8 @@ const App = () => {
             });
         });
 
+        console.log("Augmented items: ", newLabelItems);
+        setLabelItems(newLabelItems);
         setPlayers(newPlayers);
     }
 
