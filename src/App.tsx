@@ -11,7 +11,7 @@ import {
     NewPlayer,
     Player,
     PlayerId,
-    PlayerIndex, PlayerLabel
+    PlayerIndex
 } from "./common/CommonTypes";
 import LabelTypeList from "./label/LabelList";
 import {Collapse} from "./common/CommonComponents";
@@ -19,6 +19,7 @@ import {NewLabelModal} from "./label/LabelModal";
 import {SecondaryButton} from "./common/CommonInput";
 import {generateLink, shuffle, toMap, toObject} from "./common/Utils";
 import NumberPool from "./common/NumberPool";
+import {randomize} from "./common/Random";
 
 
 const idPool = new NumberPool();
@@ -105,96 +106,7 @@ const App = () => {
     }
 
     const randomizeLabels = () => {
-        // 0. Generate index so that there are no dynamic items
-        const newLabelItems = new Map();
-        Array.from(labelItems).map(([typeId, itemMap]) => {
-            const type = labelTypes.get(typeId);
-            if (type && (type.mode === "TEXT" || type.mode === "NUMBER")) {
-                console.log("Add static items", typeId);
-                labelItems.set(itemMap.id, itemMap);
-            }
-        });
-        Array.from(labelTypes).forEach(([typeId, _]) => {
-            if (!newLabelItems.get(typeId)) {
-                newLabelItems.set(typeId, new Map());
-            }
-        })
-        console.log("Cleaned items: ", newLabelItems);
-
-        // 1. For each label type, make a list of labels to add
-        const labelsToRandomize: Map<LabelTypeId, Array<LabelItem>> = new Map();
-        labelTypes.forEach(type => {
-            console.log(`Label type: ${type.id}; ${type.name}; ${type.mode}`)
-            if (type.mode === "TEXT" || type.mode === "NUMBER") {
-                const ii = Array.from(labelItems)
-                    .filter(([_, labelItem]) => labelItem.typeId === type.id)
-                    .map(([_, labelItem]) => {
-                        return {...labelItem}
-                    });
-                ii.forEach(item =>
-                    newLabelItems.set(item.id, item)
-                );
-                labelsToRandomize.set(type.id, ii);
-            } else if (type.mode === "SINGLETON") {
-                const dynamicItems = [{
-                    id: idPool.getNext(),
-                    name: type.name,
-                    typeId: type.id
-                }];
-                dynamicItems.forEach(item => {
-                    newLabelItems.set(item.id, item);
-                });
-                labelsToRandomize.set(type.id, dynamicItems);
-            } else if (type.mode === "ONE_FOR_EACH_PLAYER") {
-                const dynamicItems = Array.from(players).map(([_], index) => {
-                    return {
-                        id: idPool.getNext(),
-                        name: '' + (index + 1),
-                        typeId: type.id,
-                    }
-                });
-                dynamicItems.forEach(item => {
-                    newLabelItems.set(item.id, item);
-                });
-                labelsToRandomize.set(type.id, dynamicItems);
-            }
-        });
-
-        console.log("labelsToRandomize", labelsToRandomize);
-
-        // 2. For each player, clear all non-fixed labels
-        const newPlayers = new Map(players);
-        Array.from(newPlayers).forEach(([id, player]) => {
-            player.labels = new Map<LabelTypeId, PlayerLabel>();
-        });
-
-        const playerPool = Array.from(newPlayers).map(([id, player]) => {
-            return id;
-        });
-
-        // 3. For each label type, set random labels and remove from the list
-        labelsToRandomize.forEach((items, typeId) => {
-            // Shuffle the player order so that the same players don't always get the labels
-            // where there are no labels for everyone
-            shuffle(playerPool).forEach((playerId) => {
-                const player = newPlayers.get(playerId);
-                // Make sure that there is a player, there are more labels
-                // and that player doesn't already have a label for that type
-                if (player && items.length > 0 && !player.labels.get(typeId)) {
-                    const randomIndex = Math.floor(Math.random() * items.length);
-                    const randomLabelItem = items[randomIndex];
-                    items.splice(randomIndex, 1)
-                    const playerLabel: PlayerLabel = {
-                        dynamic: false,
-                        itemId: randomLabelItem.id,
-                        typeId: typeId,
-                    }
-                    player.labels.set(typeId, playerLabel);
-                }
-            });
-        });
-
-        console.log("Augmented items: ", newLabelItems);
+        const [newLabelItems, newPlayers] = randomize(idPool, labelTypes, labelItems, players);
         setLabelItems(newLabelItems);
         setPlayers(newPlayers);
     }
