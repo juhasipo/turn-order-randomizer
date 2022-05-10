@@ -200,8 +200,8 @@ const App = () => {
         <div className="App">
             <header className="App-header navbar">
                 <div className="App-header-container">
-                    <h1>Turn Order Randomizer</h1>
-                    <sub>2.0.0-alpha</sub>
+                    <h1>{process.env.REACT_APP_NAME}</h1>
+                    <sub>{process.env.REACT_APP_VERSION}</sub>
                 </div>
             </header>
             <section className={"link-container navbar"}>

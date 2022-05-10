@@ -1,6 +1,7 @@
 {
   "name": "turn-order-randomizer",
-  "version": "2.0.0",
+  "title": "Turn Order Randomizer",
+  "version": "2.0.0-alpha",
   "homepage": "./",
   "private": true,
   "dependencies": {
