@@ -17,23 +17,11 @@ import LabelTypeList from "./label/LabelList";
 import {Collapse} from "./common/CommonComponents";
 import {NewLabelModal} from "./label/LabelModal";
 import {SecondaryButton} from "./common/CommonInput";
+import {generateLink, shuffle, toMap, toObject} from "./common/Utils";
+import NumberPool from "./common/NumberPool";
 
-const shuffle = (array: Array<number>): Array<number> => {
-    const shuffled = Array.from(array);
-    for (var i = shuffled.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = shuffled[i];
-        shuffled[i] = shuffled[j];
-        shuffled[j] = temp;
-    }
-    return shuffled;
-};
 
-let idPool = 0;
-const incrementId = (): number => {
-    idPool++;
-    return idPool;
-}
+const idPool = new NumberPool();
 
 interface Status {
     players: PlayerIndex;
@@ -51,54 +39,6 @@ let status: Status = {
     playerOrder: new Array<PlayerId>(),
 };
 
-const isValueObject = (value: any): boolean => {
-    return value !== null && typeof value === 'object';
-}
-
-const toMap = (obj: any): Map<any, any> => {
-    console.log("Convert object", obj, "to map");
-    const m = new Map();
-    for (let objKey in obj) {
-        const value = obj[objKey];
-        const parsedKey = parseInt(objKey);
-        const key = Number.isInteger(parsedKey) ? parsedKey : objKey;
-
-        console.log("Key:",
-            key, typeof key,
-            objKey, typeof objKey
-        );
-
-        if (isValueObject(value)) {
-            console.log("Convert value to map", key, value);
-            m.set(key, value);
-        } else if (Array.isArray(value)) {
-            console.log("Convert value to array", key, value);
-            m.set(key, Array.from(value));
-        } else {
-            console.log("Assign value", key, value);
-            m.set(key, value);
-        }
-    }
-    return m;
-}
-
-const toObject = (map: Map<any, any>): any => {
-    return Object.fromEntries(Array.from(map.entries(), ([k, v]) => {
-        if (v instanceof Array) {
-            return [k, v.map(toObject)];
-        } else if (v instanceof Map) {
-            return [k, toObject(v)];
-        } else {
-            return [k, v];
-        }
-    }));
-}
-
-const generateLink = (fragment: string) => {
-    const href = window.location.href;
-    return href.substring(0, href.indexOf("#")) + "#" + fragment;
-}
-
 const fragment = window.location.hash;
 if (fragment) {
     try {
@@ -108,7 +48,7 @@ if (fragment) {
         console.log("JSON value", jsonStatus);
 
         const m = new Map();
-        for (var value in jsonStatus) {
+        for (let value in jsonStatus) {
             m.set(value, new Map(Object.entries(jsonStatus[value])));
         }
         status = {
@@ -119,7 +59,7 @@ if (fragment) {
             idPool: jsonStatus["idPool"],
         };
         console.log("Restored status", status);
-        idPool = status.idPool;
+        idPool.reset(status.idPool);
     } finally {
         window.location.hash = '';
     }
@@ -127,8 +67,6 @@ if (fragment) {
 
 const App = () => {
 
-    console.dir('Status');
-    console.dir(status);
     const [players, setPlayers] = React.useState<PlayerIndex>(status.players);
     const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>(status.playerOrder);
     const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(status.labelTypes);
@@ -137,12 +75,12 @@ const App = () => {
     const [link, setLink] = React.useState('');
 
     const generateStatusAsBase64 = (): string => {
-        const status = {
+        const status: Status = {
             players: toObject(players),
             labelTypes: toObject(labelTypes),
             labelItems: toObject(labelItems),
             playerOrder: Array.from(playerOrder),
-            idPool: idPool,
+            idPool: idPool.getNext(),
         };
 
         const statusJson = JSON.stringify(status);
@@ -199,7 +137,7 @@ const App = () => {
                 labelsToRandomize.set(type.id, ii);
             } else if (type.mode === "SINGLETON") {
                 const dynamicItems = [{
-                    id: incrementId(),
+                    id: idPool.getNext(),
                     name: type.name,
                     typeId: type.id
                 }];
@@ -210,7 +148,7 @@ const App = () => {
             } else if (type.mode === "ONE_FOR_EACH_PLAYER") {
                 const dynamicItems = Array.from(players).map(([_], index) => {
                     return {
-                        id: incrementId(),
+                        id: idPool.getNext(),
                         name: '' + (index + 1),
                         typeId: type.id,
                     }
@@ -263,12 +201,11 @@ const App = () => {
 
     const playerAdded = (player: NewPlayer) => {
         const newPlayer = {
-            id: idPool,
+            id: idPool.getNext(),
             labels: new Map(),
             ...player,
         };
         setPlayers(new Map(players.set(newPlayer.id, newPlayer)));
-        incrementId();
         resetPlayerOrder();
         setLink('');
     }
@@ -283,11 +220,10 @@ const App = () => {
 
     const labelTypeAdded = (label: NewLabelType) => {
         const newLabel = {
-            id: idPool,
+            id: idPool.getNext(),
             ...label
         };
         setLabelTypes(new Map(labelTypes.set(newLabel.id, newLabel)));
-        incrementId();
         setLink('');
         return newLabel;
     }
@@ -313,11 +249,10 @@ const App = () => {
         const newItems = new Map<LabelItemId, LabelItem>(labelItems);
         labelItemsToAdd.forEach((labelItem) => {
             const newLabelItem: LabelItem = {
-                id: idPool,
+                id: idPool.getNext(),
                 typeId: labelItem.labelType,
                 name: labelItem.name,
             };
-            incrementId();
             const label = labelTypes.get(labelItem.labelType);
 
             console.log(`Label item ${labelItem.name} added to type ${label?.name}`)
