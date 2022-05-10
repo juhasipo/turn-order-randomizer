@@ -16,6 +16,7 @@ import {
 import LabelTypeList from "./label/LabelList";
 import {Collapse} from "./common/CommonComponents";
 import {NewLabelModal} from "./label/LabelModal";
+import {SecondaryButton} from "./common/CommonInput";
 
 const shuffle = (array: Array<number>): Array<number> => {
     const shuffled = Array.from(array);
@@ -383,12 +384,32 @@ const App = () => {
                         subtitle={`${labelTypes.size} label types`}
                     >
                         <NewLabelModal
-                            openButtonTitle={"Add Label"}
+                            openButtonTitle={"Custom Label"}
                             open={labelModalOpen}
                             labelAdded={labelAdded}
                             openModal={openLabelModal}
                             closeModal={closeLabelModal}
                         />
+                        <SecondaryButton
+                            onClick={(e) => {
+                                labelTypeAdded({
+                                    name: '1st Player',
+                                    mode: 'SINGLETON',
+                                });
+                            }}
+                        >
+                            1st player
+                        </SecondaryButton>
+                        <SecondaryButton
+                            onClick={(e) => {
+                                labelTypeAdded({
+                                    name: 'Seat',
+                                    mode: 'ONE_FOR_EACH_PLAYER',
+                                });
+                            }}
+                        >
+                            Seat
+                        </SecondaryButton>
                         <div className={"block"}/>
                         <LabelTypeList
                             labelTypeAdded={labelTypeAdded}
