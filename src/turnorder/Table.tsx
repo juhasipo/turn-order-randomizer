@@ -94,21 +94,23 @@ export default class Table extends React.Component<Props, any> {
     getPlayerItem = (order: number, player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
         if (player) {
             return (
-                <div key={'player-' + player.id} className={"card"}>
-                    <header className={"card-header"}>
-                        <p className={"card-header-title"}>
-                            <span className={"player-order-no"}>{order}</span>
-                            <span className={"player-order-separator"}>: </span>
-                            <span className={"player-name"}>{player.name}</span>
-                        </p>
-                    </header>
-                    <div className={"card-content"}>
-                        <PlayerLabels
-                            player={player}
-                            labels={player.labels}
-                            labelTypes={labelTypes}
-                            labelItems={labelItems}
-                        />
+                <div key={'player-' + player.id} className={"column is-one-quarter"}>
+                    <div className={"card"}>
+                        <header className={"card-header"}>
+                            <p className={"card-header-title"}>
+                                <span className={"player-order-no"}>{order}</span>
+                                <span className={"player-order-separator"}>: </span>
+                                <span className={"player-name"}>{player.name}</span>
+                            </p>
+                        </header>
+                        <div className={"card-content"}>
+                            <PlayerLabels
+                                player={player}
+                                labels={player.labels}
+                                labelTypes={labelTypes}
+                                labelItems={labelItems}
+                            />
+                        </div>
                     </div>
                 </div>
             )
@@ -128,14 +130,12 @@ export default class Table extends React.Component<Props, any> {
             <Collapse
                 title={"Results"}
                 openByDefault={true}
-                actions={(
-                    <>
-                        <PrimaryButton onClick={this.props.randomizePlayers}>Randomize Turn Order</PrimaryButton>
-                        <SecondaryButton onClick={this.props.randomizeLabels}>Randomize Labels</SecondaryButton>
-                    </>
-                )}
+                actions={[
+                    <PrimaryButton onClick={this.props.randomizePlayers}>Randomize Turn Order</PrimaryButton>,
+                    <SecondaryButton onClick={this.props.randomizeLabels}>Randomize Labels</SecondaryButton>
+                ]}
             >
-                <div className={"player-cards"}>
+                <div className={"columns is-multiline"}>
                     {this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems)}
                 </div>
             </Collapse>

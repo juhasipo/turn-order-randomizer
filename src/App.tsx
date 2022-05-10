@@ -217,59 +217,69 @@ const App = () => {
             </section>
             <main className={"section"}>
                 <div className={"container"}>
-                    <Collapse
-                        title={"Players"}
-                        subtitle={`${players.size} players`}
-                    >
-                        <PlayerList
-                            playerAdded={playerAdded}
-                            playerRemoved={playerRemoved}
-                            players={players}/>
-                    </Collapse>
-                    <Collapse
-                        title={"Labels"}
-                        subtitle={`${labelTypes.size} label types`}
-                    >
-                        <NewLabelModal
-                            openButtonTitle={"Custom Label..."}
-                            open={labelModalOpen}
-                            labelAdded={labelAdded}
-                            openModal={openLabelModal}
-                            closeModal={closeLabelModal}
-                        />
-                        <SecondaryButton
-                            onClick={(e) => {
-                                labelTypeAdded({
-                                    name: '1st Player',
-                                    mode: 'SINGLETON',
-                                });
-                            }}
-                        >
-                            1st player
-                        </SecondaryButton>
-                        <SecondaryButton
-                            onClick={(e) => {
-                                labelTypeAdded({
-                                    name: 'Seat',
-                                    mode: 'ONE_FOR_EACH_PLAYER',
-                                });
-                            }}
-                        >
-                            Seat
-                        </SecondaryButton>
-                        <div className={"block"}/>
-                        <LabelTypeList
-                            labelTypeAdded={labelTypeAdded}
-                            labelTypeRemoved={labelTypeRemoved}
+                    <div className={"columns"}>
+                        <div className={"column is-half"}>
+                            <Collapse
+                                title={"Players"}
+                                subtitle={`${players.size} players`}
+                            >
+                                <PlayerList
+                                    playerAdded={playerAdded}
+                                    playerRemoved={playerRemoved}
+                                    players={players}/>
+                            </Collapse>
+                        </div>
 
-                            labelItemAdded={labelItemAdded}
-                            labelItemRemoved={labelItemRemoved}
-                            labelItemChanged={labelItemChanged}
+                        <div className={"column is-half"}>
+                            <Collapse
+                                title={"Labels"}
+                                subtitle={`${labelTypes.size} label types`}
+                            >
+                                <div className={"buttons"}>
+                                    <NewLabelModal
+                                        openButtonTitle={"Custom Label..."}
+                                        open={labelModalOpen}
+                                        labelAdded={labelAdded}
+                                        openModal={openLabelModal}
+                                        closeModal={closeLabelModal}
+                                    />
+                                    <SecondaryButton
+                                        onClick={(e) => {
+                                            labelTypeAdded({
+                                                name: '1st Player',
+                                                mode: 'SINGLETON',
+                                            });
+                                        }}
+                                    >
+                                        1st player
+                                    </SecondaryButton>
+                                    <SecondaryButton
+                                        onClick={(e) => {
+                                            labelTypeAdded({
+                                                name: 'Seat',
+                                                mode: 'ONE_FOR_EACH_PLAYER',
+                                            });
+                                        }}
+                                    >
+                                        Seat
+                                    </SecondaryButton>
+                                </div>
+                                <div className={"block"}/>
+                                <LabelTypeList
+                                    labelTypeAdded={labelTypeAdded}
+                                    labelTypeRemoved={labelTypeRemoved}
 
-                            labels={labelTypes}
-                            labelItems={labelItems}
-                        />
-                    </Collapse>
+                                    labelItemAdded={labelItemAdded}
+                                    labelItemRemoved={labelItemRemoved}
+                                    labelItemChanged={labelItemChanged}
+
+                                    labels={labelTypes}
+                                    labelItems={labelItems}
+                                />
+                            </Collapse>
+                        </div>
+                    </div>
+
                     <Table
                         players={players}
                         playerOrder={playerOrder}

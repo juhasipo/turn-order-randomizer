@@ -34,15 +34,15 @@ export const Collapse = (props: CollapseProps) => {
                     <button className={"button is-rounded"} onClick={toggle}>{open ? 'V' : '>'}</button>
                 </div>
             </div>
-            <div className={getChildrenClass(open)}>
-                <div className={"block"}>
-                    {open && props.children}
-                </div>
+            <div className={getChildrenClass(open) + " collapse-actions"}>
                 {props.actions && (
-                    <div className={"block"}>
+                    <div className={"buttons"}>
                         {open && props.actions && props.actions}
                     </div>
                 )}
+                <div className={"block"}>
+                    {open && props.children}
+                </div>
             </div>
         </div>
     )

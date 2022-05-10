@@ -79,7 +79,7 @@ export const LabelItemEditor = (props: LabelItemEditorProps) => {
                     )}
                 </div>
                 <div className={"card-header-icon"}>
-                    <SecondaryButton onClick={startEditing}>Edit</SecondaryButton>
+                    {!editMode && (<SecondaryButton onClick={startEditing}>Edit</SecondaryButton>)}
                     <button className={"button is-danger"} onClick={(e) => props.labelItemRemoved(props.labelTypeId, props.labelItem.id)}>
                         Remove
                     </button>
@@ -104,34 +104,36 @@ export default class LabelTypeList extends React.Component<Props, any> {
     }
 
     getLabelItems = (labelTypeId: LabelTypeId, labelItems: LabelItemIndex) => {
-        return (
-            <>
-                {Array.from(labelItems)
+        return Array.from(labelItems)
                     .filter(([_, labelItem]) => labelItem.typeId === labelTypeId)
-                    .map(([id, label]) => this.getLabelItem(labelTypeId, label))}
-            </>
-        )
+                    .map(([id, label]) => this.getLabelItem(labelTypeId, label));
     }
 
     getLabelTypeItem = (label: LabelType, labelItems: LabelItemIndex) => {
+        const labelItemList = this.getLabelItems(label.id, labelItems);
+
         return (
-            <Collapse
+            <div
                 key={'labe-l' + label.id}
-                title={label.name}
-                subtitle={LABEL_TYPE_MODE_TO_NAME.get(label.mode)}
-                modalStyle={"is-info"}
+                className={"column is-half"}
             >
-                <div className={"panel-block"}>
-                    <div className={"label-items"}>
-                        {this.getLabelItems(label.id, labelItems)}
-                    </div>
-                </div>
-                <div className={"panel-block"}>
-                    <DangerButton onClick={(e) => this.props.labelTypeRemoved(label.id)}>
-                        Remove Label Type
-                    </DangerButton>
-                </div>
-            </Collapse>
+                <Collapse
+                    title={label.name}
+                    subtitle={LABEL_TYPE_MODE_TO_NAME.get(label.mode)}
+                    modalStyle={"is-info"}
+                    actions={[
+                        <DangerButton onClick={(e) => this.props.labelTypeRemoved(label.id)}>
+                            Remove Label Type
+                        </DangerButton>
+                    ]}
+                >
+                    {labelItemList && labelItemList.length > 0 && (
+                        <div className={"label-items"}>
+                            {this.getLabelItems(label.id, labelItems)}
+                        </div>
+                    )}
+                </Collapse>
+            </div>
         )
     }
 
@@ -145,7 +147,7 @@ export default class LabelTypeList extends React.Component<Props, any> {
     render() {
         return (
             <div className={"PlayerList"}>
-                <div className={"label-types"}>
+                <div className={"label-types columns is-multiline"}>
                     {this.getLabelTypeItems(this.props.labels, this.props.labelItems)}
                 </div>
             </div>

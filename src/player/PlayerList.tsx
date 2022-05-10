@@ -28,11 +28,16 @@ export default class PlayerList extends React.Component<Props, any> {
 
     getPlayerItem = (player: Player) => {
         return (
-            <div key={player.name} className={"card"}>
-                <div className={"card-header"}>
-                    <div className={"card-header-title"}>{player.name}</div>
-                    <div className={"card-header-icon"}>
-                        <RemoveButton onClick={(e) => this.props.playerRemoved(player.id)}/>
+            <div
+              key={'player-' + player.id}
+              className={"column is-half"}
+            >
+                <div className={"card"}>
+                    <div className={"card-header"}>
+                        <div className={"card-header-title"}>{player.name}</div>
+                        <div className={"card-header-icon"}>
+                            <RemoveButton onClick={(e) => this.props.playerRemoved(player.id)}/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -50,7 +55,9 @@ export default class PlayerList extends React.Component<Props, any> {
         return (
             <div className={"PlayerList"}>
                 <AddPlayer playerAdded={this.props.playerAdded} />
-                <ol>{this.getPlayerItems(this.props.players)}</ol>
+                <div className={"columns is-multiline"}>
+                    {this.getPlayerItems(this.props.players)}
+                </div>
             </div>
         );
     }
