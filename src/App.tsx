@@ -20,6 +20,7 @@ import {SecondaryButton} from "./common/CommonInput";
 import {generateLink, shuffle, toMap, toObject} from "./common/Utils";
 import NumberPool from "./common/NumberPool";
 import {randomize} from "./common/Random";
+import {Dice} from "./dice/Dice";
 
 
 const idPool = new NumberPool();
@@ -87,6 +88,8 @@ const App = () => {
     const [labelItems, setLabelItems] = React.useState<LabelItemIndex>(status.labelItems);
     const [labelModalOpen, setLabelModalOpen] = React.useState<boolean>(false);
     const [link, setLink] = React.useState('');
+
+    const [selectedTab, setSelectedTab] = React.useState('tor');
 
     const generateStatusAsBase64 = (): string => {
         const status: Status = {
@@ -230,80 +233,95 @@ const App = () => {
                     {!!link && <a href={link}>{link}</a>}
                 </div>
             </section>
+            <section className={"tabs is-centered"}>
+                <ul>
+                    <li className={selectedTab === 'tor' ? "is-active" : ''}>
+                        <a onClick={(e) => setSelectedTab('tor')}>TOR</a>
+                    </li>
+                    <li className={selectedTab === 'dice' ? "is-active" : ''}>
+                        <a onClick={(e) => setSelectedTab('dice')}>Dice</a>
+                    </li>
+                </ul>
+            </section>
             <main className={"section"}>
-                <div className={"container"}>
-                    <div className={"columns"}>
-                        <div className={"column is-half"}>
-                            <Collapse
-                                title={"Players"}
-                                subtitle={`${players.size} players`}
-                            >
-                                <PlayerList
-                                    playerAdded={playerAdded}
-                                    playerRemoved={playerRemoved}
-                                    players={players}/>
-                            </Collapse>
-                        </div>
+                {selectedTab === 'tor' &&(
+                    <div className={"container"}>
+                        <div className={"columns"}>
+                            <div className={"column is-half"}>
+                                <Collapse
+                                    title={"Players"}
+                                    subtitle={`${players.size} players`}
+                                >
+                                    <PlayerList
+                                        playerAdded={playerAdded}
+                                        playerRemoved={playerRemoved}
+                                        players={players}/>
+                                </Collapse>
+                            </div>
 
-                        <div className={"column is-half"}>
-                            <Collapse
-                                title={"Labels"}
-                                subtitle={`${labelTypes.size} label types`}
-                            >
-                                <div className={"buttons"}>
-                                    <NewLabelModal
-                                        openButtonTitle={"Custom Label..."}
-                                        open={labelModalOpen}
-                                        labelAdded={labelAdded}
-                                        openModal={openLabelModal}
-                                        closeModal={closeLabelModal}
+                            <div className={"column is-half"}>
+                                <Collapse
+                                    title={"Labels"}
+                                    subtitle={`${labelTypes.size} label types`}
+                                >
+                                    <div className={"buttons"}>
+                                        <NewLabelModal
+                                            openButtonTitle={"Custom Label..."}
+                                            open={labelModalOpen}
+                                            labelAdded={labelAdded}
+                                            openModal={openLabelModal}
+                                            closeModal={closeLabelModal}
+                                        />
+                                        <SecondaryButton
+                                            onClick={(e) => {
+                                                labelTypeAdded({
+                                                    name: '1st Player',
+                                                    mode: 'SINGLETON',
+                                                });
+                                            }}
+                                        >
+                                            1st player
+                                        </SecondaryButton>
+                                        <SecondaryButton
+                                            onClick={(e) => {
+                                                labelTypeAdded({
+                                                    name: 'Seat',
+                                                    mode: 'ONE_FOR_EACH_PLAYER',
+                                                });
+                                            }}
+                                        >
+                                            Seat
+                                        </SecondaryButton>
+                                    </div>
+                                    <div className={"block"}/>
+                                    <LabelTypeList
+                                        labelTypeAdded={labelTypeAdded}
+                                        labelTypeRemoved={labelTypeRemoved}
+
+                                        labelItemAdded={labelItemAdded}
+                                        labelItemRemoved={labelItemRemoved}
+                                        labelItemChanged={labelItemChanged}
+
+                                        labels={labelTypes}
+                                        labelItems={labelItems}
                                     />
-                                    <SecondaryButton
-                                        onClick={(e) => {
-                                            labelTypeAdded({
-                                                name: '1st Player',
-                                                mode: 'SINGLETON',
-                                            });
-                                        }}
-                                    >
-                                        1st player
-                                    </SecondaryButton>
-                                    <SecondaryButton
-                                        onClick={(e) => {
-                                            labelTypeAdded({
-                                                name: 'Seat',
-                                                mode: 'ONE_FOR_EACH_PLAYER',
-                                            });
-                                        }}
-                                    >
-                                        Seat
-                                    </SecondaryButton>
-                                </div>
-                                <div className={"block"}/>
-                                <LabelTypeList
-                                    labelTypeAdded={labelTypeAdded}
-                                    labelTypeRemoved={labelTypeRemoved}
-
-                                    labelItemAdded={labelItemAdded}
-                                    labelItemRemoved={labelItemRemoved}
-                                    labelItemChanged={labelItemChanged}
-
-                                    labels={labelTypes}
-                                    labelItems={labelItems}
-                                />
-                            </Collapse>
+                                </Collapse>
+                            </div>
                         </div>
-                    </div>
 
-                    <Table
-                        players={players}
-                        playerOrder={playerOrder}
-                        randomizePlayers={randomizePlayers}
-                        randomizeLabels={randomizeLabels}
-                        labelTypes={labelTypes}
-                        labelItems={labelItems}
-                    />
-                </div>
+                        <Table
+                            players={players}
+                            playerOrder={playerOrder}
+                            randomizePlayers={randomizePlayers}
+                            randomizeLabels={randomizeLabels}
+                            labelTypes={labelTypes}
+                            labelItems={labelItems}
+                        />
+                    </div>
+                )}
+                {selectedTab === 'dice'&& (
+                    <Dice/>
+                )}
             </main>
         </div>
     );
