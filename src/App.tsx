@@ -231,7 +231,7 @@ const App = () => {
                         subtitle={`${labelTypes.size} label types`}
                     >
                         <NewLabelModal
-                            openButtonTitle={"Custom Label"}
+                            openButtonTitle={"Custom Label..."}
                             open={labelModalOpen}
                             labelAdded={labelAdded}
                             openModal={openLabelModal}

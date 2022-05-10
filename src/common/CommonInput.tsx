@@ -13,6 +13,12 @@ export const SecondaryButton = (props: React.ButtonHTMLAttributes<{}>) => {
     )
 }
 
+export const DangerButton = (props: React.ButtonHTMLAttributes<{}>) => {
+    return (
+        <button className={"button is-danger"} {...props}>{props.children}</button>
+    )
+}
+
 export const RemoveButton = (props: React.ButtonHTMLAttributes<{}>) => {
     return (
         <button className={"delete is-danger"} {...props}>X</button>

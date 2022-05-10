@@ -5,7 +5,7 @@ import {
     NewLabelType,
     LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItem, LABEL_TYPE_MODE_TO_NAME
 } from "../common/CommonTypes";
-import {SecondaryButton, RemoveButton} from "../common/CommonInput";
+import {SecondaryButton, RemoveButton, DangerButton} from "../common/CommonInput";
 import {useState} from "react";
 import {Collapse} from "../common/CommonComponents";
 
@@ -127,9 +127,9 @@ export default class LabelTypeList extends React.Component<Props, any> {
                     </div>
                 </div>
                 <div className={"panel-block"}>
-                    <SecondaryButton onClick={(e) => this.props.labelTypeRemoved(label.id)}>
+                    <DangerButton onClick={(e) => this.props.labelTypeRemoved(label.id)}>
                         Remove Label Type
-                    </SecondaryButton>
+                    </DangerButton>
                 </div>
             </Collapse>
         )
