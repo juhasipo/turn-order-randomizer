@@ -66,6 +66,19 @@ if (fragment) {
     }
 }
 
+function resolveVersionAndTitle(): {title: string, version: string} {
+    const title = process.env.REACT_APP_NAME || '';
+
+    let version = process.env.REACT_APP_VERSION || '';
+    if (process.env.REACT_APP_VERSION_HASH) {
+        version += "-" + process.env.REACT_APP_VERSION_HASH;
+    }
+
+    console.dir(process.env);
+
+    return {title, version};
+}
+
 const App = () => {
 
     const [players, setPlayers] = React.useState<PlayerIndex>(status.players);
@@ -196,12 +209,14 @@ const App = () => {
         setLink('');
     }
 
+    let {title, version} = resolveVersionAndTitle();
+
     return (
         <div className="App">
             <header className="App-header navbar">
                 <div className="App-header-container">
-                    <h1>{process.env.REACT_APP_NAME}</h1>
-                    <sub>{process.env.REACT_APP_VERSION}</sub>
+                    <h1>{title}</h1>
+                    <sub>{version}</sub>
                 </div>
             </header>
             <section className={"link-container navbar"}>
