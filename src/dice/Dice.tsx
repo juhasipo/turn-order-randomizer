@@ -1,11 +1,15 @@
 import {useState} from "react";
 import './Dice.scss'
+import {ToggleButton} from "../common/CommonInput";
+
+type ThrowMode = 'FAST' | 'POWER';
 
 export const Dice = () => {
 
     const [diceResults, setDiceResults] = useState<Array<number>>([0]);
     const [numOfDice, setNumOfDice] = useState(1);
     const [maxResult, setMaxResult] = useState(6);
+    const [throwMode, setThrowMode] = useState<ThrowMode>('FAST');
 
     const changeNumOfDice = (newValue: number) => {
         setNumOfDice(newValue);
@@ -37,11 +41,33 @@ export const Dice = () => {
     }
 
     const throwDice = () => {
-        const results = Array.from(diceResults);
-        for (let i = 0; i < diceResults.length; ++i) {
-            results[i] = Math.ceil(Math.random() * maxResult);
+        if (throwMode === 'FAST') {
+            const results = Array.from(diceResults);
+            for (let i = 0; i < diceResults.length; ++i) {
+                results[i] = Math.ceil(Math.random() * maxResult);
+            }
+            setDiceResults(results);
+        } else {
+            const maxCounter = 20;
+            const results = Array.from(diceResults).map(_ => 0);
+            const maxLength = diceResults.length;
+            const v = {index: 0, counter: maxCounter};
+            const interval = setInterval(function() {
+                if (v.index >= maxLength) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                results[v.index] = Math.ceil(Math.random() * maxResult);
+                setDiceResults(Array.from(results));
+                v.counter--;
+
+                if (v.counter < 0) {
+                    v.counter = maxCounter;
+                    v.index++;
+                }
+            }, 50);
         }
-        setDiceResults(results);
     }
 
     return (
@@ -70,12 +96,22 @@ export const Dice = () => {
                 </p>
             </div>
             <div className={"is-centered"}>
+                <div className={"buttons is-centered"}>
+                    <ToggleButton currentValue={throwMode} value={'FAST'} onClick={setThrowMode}>Fast</ToggleButton>
+                    <ToggleButton currentValue={throwMode} value={'POWER'} onClick={setThrowMode}>Power</ToggleButton>
+                </div>
+
+                <div className={"block"}/>
+
                 <button
                     className={"button is-primary"}
                     onClick={(e) => throwDice()}
                 >
                     Throw All
                 </button>
+
+                <div className={"block"}/>
+
                 <div className={"dice-results"}>
                     {getResults(diceResults)}
                 </div>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {ReactNode, useState} from "react";
 import './CommonInput.scss'
 
 export const PrimaryButton = (props: React.ButtonHTMLAttributes<{}>) => {
@@ -23,6 +23,23 @@ export const RemoveButton = (props: React.ButtonHTMLAttributes<{}>) => {
     return (
         <button className={"delete is-danger"} {...props}>X</button>
     )
+}
+
+export interface ToggleButtonProps<T> {
+    currentValue: T;
+    value: T;
+    onClick: (newValue: T) => void;
+    children?: ReactNode[] | ReactNode
+}
+
+export const ToggleButton = <T, >(props: ToggleButtonProps<T>) => {
+    return (
+        <button
+            className={"button " + (props.value === props.currentValue ? ' is-primary is-active' : '')}
+            onClick={(e) => props.onClick(props.value)}
+        >
+            {props.children}
+        </button>)
 }
 
 export interface InputProps extends React.InputHTMLAttributes<any> {
