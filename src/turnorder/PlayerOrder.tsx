@@ -11,7 +11,7 @@ import {
     PlayerLabel
 } from "../common/CommonTypes";
 import {PrimaryButton, SecondaryButton} from "../common/CommonInput";
-import './Table.scss'
+import './PlayerOrder.scss'
 import {Collapse} from "../common/CommonComponents";
 
 export interface Props {
@@ -89,7 +89,7 @@ const PlayerLabels = (props: PlayerLabelProps) => {
     }
 }
 
-export default class Table extends React.Component<Props, any> {
+export default class PlayerOrder extends React.Component<Props, any> {
 
     getPlayerItem = (order: number, player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
         if (player) {

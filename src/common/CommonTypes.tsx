@@ -51,3 +51,11 @@ export const LABEL_TYPE_MODE_TO_NAME = new Map<LabelTypeMode, string>([
     ['SINGLETON', "Singleton"],
     ['ONE_FOR_EACH_PLAYER', "One for Each"],
 ]);
+
+export interface Status {
+    players: PlayerIndex;
+    labelTypes: LabelTypeIndex;
+    labelItems: LabelItemIndex;
+    playerOrder: Array<PlayerId>;
+    idPool: number;
+}
