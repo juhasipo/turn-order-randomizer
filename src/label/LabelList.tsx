@@ -3,7 +3,7 @@ import {
     LabelTypeId,
     LabelTypeIndex,
     NewLabelType,
-    LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItem, LABEL_TYPE_MODE_TO_NAME
+    LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItem, findLabelTypeName
 } from "../common/CommonTypes";
 import {SecondaryButton, RemoveButton, DangerButton} from "../common/CommonInput";
 import {useState} from "react";
@@ -119,7 +119,7 @@ export default class LabelTypeList extends React.Component<Props, any> {
             >
                 <Collapse
                     title={label.name}
-                    subtitle={LABEL_TYPE_MODE_TO_NAME.get(label.mode)}
+                    subtitle={findLabelTypeName(label.mode)}
                     modalStyle={"is-info"}
                     actions={[
                         <DangerButton onClick={(e) => this.props.labelTypeRemoved(label.id)}>

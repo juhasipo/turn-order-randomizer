@@ -1,4 +1,10 @@
-import {LABEL_TYPE_MODE_TO_NAME, LabelTypeMode, NewLabelItem, NewLabelType} from "../common/CommonTypes";
+import {
+    LABEL_TYPES,
+    LabelTypeButton,
+    LabelTypeMode,
+    NewLabelItem,
+    NewLabelType
+} from "../common/CommonTypes";
 import {useState} from "react";
 import {InputField, RemoveButton} from "../common/CommonInput";
 
@@ -16,21 +22,18 @@ interface ModeSelectorProps {
 }
 
 const ModeSelector = (props: ModeSelectorProps) => {
-    const getSelectorButton = (selectorMode: LabelTypeMode, currentMode: LabelTypeMode, modeChanged: (mode: LabelTypeMode) => void) => {
+    const getSelectorButton = (labelType: LabelTypeButton, currentMode: LabelTypeMode, modeChanged: (mode: LabelTypeMode) => void) => {
         return <button
-            className={"button " + (selectorMode === currentMode ? 'is-info' : '')}
-            onClick={(e) => modeChanged(selectorMode)}
+            className={"button " + (labelType.mode === currentMode ? 'is-info' : '')}
+            onClick={(e) => modeChanged(labelType.mode)}
         >
-            {LABEL_TYPE_MODE_TO_NAME.get(selectorMode)}
+            {labelType.name}
         </button>
     }
 
     return (
         <div className="buttons has-addons">
-            {getSelectorButton("TEXT", props.selected, props.modeChanged)}
-            {getSelectorButton("NUMBER", props.selected, props.modeChanged)}
-            {getSelectorButton("SINGLETON", props.selected, props.modeChanged)}
-            {getSelectorButton("ONE_FOR_EACH_PLAYER", props.selected, props.modeChanged)}
+            {LABEL_TYPES.map(l => getSelectorButton(l, props.selected, props.modeChanged))}
         </div>
     );
 }
@@ -111,7 +114,7 @@ const StringItemList = (props: LabelItemListProps) => {
                 </div>
                 <div className={"control"}>
                     <button
-                        className={"button"}
+                        className={"button is-primary"}
                         onClick={itemAdded}
                         disabled={!isValid(newItem)}
                     >

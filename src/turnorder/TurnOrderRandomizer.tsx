@@ -9,7 +9,7 @@ import {
     LabelItem,
     LabelItemId,
     LabelItemIndex, LabelTypeId,
-    LabelTypeIndex,
+    LabelTypeIndex, LabelTypeMode,
     NewLabelItem,
     NewLabelType,
     NewPlayer,
@@ -24,6 +24,23 @@ export interface Props {
     idPool: NumberPool;
     initialStatus: Status;
 }
+
+interface LabelShortcut {
+    mode: LabelTypeMode;
+    name: string;
+}
+
+const LABEL_SHORTCUTS: LabelShortcut[] = [
+    {
+        mode: 'SINGLETON',
+        name: '1st Player'
+    },
+    {
+        mode: 'ONE_FOR_EACH_PLAYER',
+        name: 'Seat'
+    },
+];
+
 
 export const TurnOrderRandomizer = (props: Props) => {
 
@@ -160,9 +177,13 @@ export const TurnOrderRandomizer = (props: Props) => {
         setLink('');
     }
 
+    const getLabelShortcuts = () => {
+        return LABEL_SHORTCUTS.map(l => <SecondaryButton onClick={(e) => labelTypeAdded(l)}>{l.name}</SecondaryButton>)
+    }
+
     return (
         <div className={"container"}>
-
+            
             <section className={"link-container navbar block"}>
                 <button
                     className={"button is-link"}
@@ -201,26 +222,7 @@ export const TurnOrderRandomizer = (props: Props) => {
                                 openModal={openLabelModal}
                                 closeModal={closeLabelModal}
                             />
-                            <SecondaryButton
-                                onClick={(e) => {
-                                    labelTypeAdded({
-                                        name: '1st Player',
-                                        mode: 'SINGLETON',
-                                    });
-                                }}
-                            >
-                                1st player
-                            </SecondaryButton>
-                            <SecondaryButton
-                                onClick={(e) => {
-                                    labelTypeAdded({
-                                        name: 'Seat',
-                                        mode: 'ONE_FOR_EACH_PLAYER',
-                                    });
-                                }}
-                            >
-                                Seat
-                            </SecondaryButton>
+                            {getLabelShortcuts()}
                         </div>
                         <div className={"block"}/>
                         <LabelTypeList

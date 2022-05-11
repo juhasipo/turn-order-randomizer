@@ -45,12 +45,33 @@ export type LabelTypeIndex = Map<LabelTypeId, LabelType>;
 export type LabelItemIndex = Map<LabelItemId, LabelItem>
 
 
-export const LABEL_TYPE_MODE_TO_NAME = new Map<LabelTypeMode, string>([
-    ['TEXT', "Text"],
-    ['NUMBER', "Number"],
-    ['SINGLETON', "Singleton"],
-    ['ONE_FOR_EACH_PLAYER', "One for Each"],
-]);
+export interface LabelTypeButton {
+    mode: LabelTypeMode;
+    name: string;
+}
+
+export const LABEL_TYPES: LabelTypeButton[] = [
+    {
+        mode: 'TEXT',
+        name: 'Text'
+    },
+    {
+        mode: 'NUMBER',
+        name: 'Number'
+    },
+    {
+        mode: 'SINGLETON',
+        name: 'Only One'
+    },
+    {
+        mode: 'ONE_FOR_EACH_PLAYER',
+        name: 'One for Each Player'
+    },
+];
+
+export const findLabelTypeName = (mode: LabelTypeMode): string => {
+    return LABEL_TYPES.filter(l => l.mode === mode)[0].name;
+}
 
 export interface Status {
     players: PlayerIndex;
