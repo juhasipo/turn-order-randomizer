@@ -4,7 +4,7 @@
   flex-wrap: wrap;
 }
 
-$dice_result_height: 70px;
+$dice_result_height: 90px;
 
 .dice-container {
   text-align: center;
@@ -16,23 +16,35 @@ input.input.dice-number {
 
 .dice-result {
   text-align: center;
-  vertical-align: middle;
 
   height: $dice_result_height;
   width: $dice_result_height;
-  line-height: $dice_result_height;
-
-  font-size: $dice_result_height * 0.6;
-  font-weight: bold;
 
   border-radius: 10px;
   border: 2px solid #282c34;
   margin: 10px 10px;
 
   box-shadow: 2px 2px 4px 2px rgba(#282c34, .2);
+
+  .die-type {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  .die-result {
+    $size_multiplier: 0.4;
+    font-size: $dice_result_height * $size_multiplier;
+    font-weight: bold;
+    vertical-align: middle;
+    line-height: $dice_result_height * $size_multiplier;
+  }
+
+  .die-actions {
+
+  }
 }
 
-.dice-options {
-  max-width: 600px;
+.card.dice-options {
+  max-width: 350px;
   margin: 0 auto;
 }

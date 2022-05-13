@@ -8,9 +8,10 @@ interface Dice {
     name: string;
     min: number;
     max: number;
+    result?: number;
 }
 
-const DICE: Dice[] = [
+const DICE_MODELS: Dice[] = [
     {name: "D4", min: 1, max: 4},
     {name: "D6", min: 1, max: 6},
     {name: "D8", min: 1, max: 8},
@@ -20,29 +21,39 @@ const DICE: Dice[] = [
     {name: "D20", min: 1, max: 20},
 ];
 
-type DiceResult = number|null;
+const DEFAULT_DICE = {...DICE_MODELS[1]};
+
+type DiceResult = number | null;
 
 export const Dice = () => {
 
-    const [diceResults, setDiceResults] = useState<Array<DiceResult>>([0]);
-    const [numOfDice, setNumOfDice] = useState(1);
+    const [dice, setDice] = useState<Array<Dice>>([DEFAULT_DICE]);
     const [minResult, setMinResult] = useState(1);
     const [maxResult, setMaxResult] = useState(6);
     const [throwMode, setThrowMode] = useState<ThrowMode>('FAST');
 
-    const changeNumOfDice = (newValue: number) => {
-        setNumOfDice(newValue);
-        const results: DiceResult[] = [];
-        for (let i = 0; i < newValue; ++i) {
-            results.push(null);
+    const addDie = () => {
+        const dieName = DICE_MODELS.filter(d => maxResult === d.max && minResult === d.min)?.at(0)?.name;
+        const die: Dice = {
+            name: dieName || "" + minResult + "–" + maxResult,
+            min: minResult,
+            max: maxResult,
         }
-        setDiceResults(results);
+        const newDice = dice.concat(die);
+        setDice(newDice);
+    }
+
+    const removeDie = (index: number) => {
+        console.log("Delte die at ", index);
+        const newDice = Array.from(dice);
+        newDice.splice(index, 1);
+        setDice(newDice);
     }
 
     const getDieButton = (die: Dice) => {
         const isSelected = maxResult === die.max && minResult === die.min;
         return <button
-            className={"button" + (isSelected ? ' is-active is-info' : '')}
+            className={"button card-footer-item die-selector" + (isSelected ? ' is-active is-info' : '')}
             onClick={(e) => {
                 setMinResult(die.min);
                 setMaxResult(die.max);
@@ -52,19 +63,27 @@ export const Dice = () => {
         </button>
     }
 
-    const getResults = (results: DiceResult[]) => {
+    const getResults = (results: Dice[]) => {
         return Array.from(results)
-            .map(result => {
+            .map((die, index) => {
                 return (
                     <div className={"dice-result"}>
-                        {result !== null ? result : '-'}
+                        <div className={"die-type"}>
+                            {die.name}
+                        </div>
+                        <div className={"die-result"}>
+                            {die.result !== undefined ? die.result : '-'}
+                        </div>
+                        <div className={"die-actions"}>
+                            <button className={"delete"} onClick={(e) => removeDie(index)}/>
+                        </div>
                     </div>
                 );
             });
     }
 
     const getRandomValue = (min: number, max: number): number => {
-        return Math.floor(Math.random() * (max-min+1) + min);
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 
     const getDieStats = (results: DiceResult[]) => {
@@ -83,26 +102,31 @@ export const Dice = () => {
 
     const throwDice = () => {
         if (throwMode === 'FAST') {
-            const results = Array.from(diceResults);
-            for (let i = 0; i < diceResults.length; ++i) {
-                results[i] = getRandomValue(minResult, maxResult);
+            const results = Array.from(dice);
+            for (let i = 0; i < dice.length; ++i) {
+                const die = results[i];
+                die.result = getRandomValue(die.min, die.max);
             }
-            setDiceResults(results);
+            setDice(results);
         } else {
             const maxCounter = 20;
-            const results = Array.from(diceResults).map(_ => null as number|null);
-            const maxLength = diceResults.length;
+            const newDice = Array.from(dice).map(die => {
+                die.result = undefined;
+                return die;
+            });
+            const maxLength = newDice.length;
             const v = {index: 0, counter: maxCounter};
-            const interval = setInterval(function() {
+            const interval = setInterval(function () {
                 if (v.index >= maxLength) {
                     clearInterval(interval);
                     return;
                 }
 
                 if (v.index !== null) {
-                    results[v.index] = getRandomValue(minResult, maxResult);
+                    const die = newDice[v.index];
+                    die.result = getRandomValue(die.min, die.max);
                 }
-                setDiceResults(Array.from(results));
+                setDice(Array.from(newDice));
                 v.counter--;
 
                 if (v.counter < 0) {
@@ -114,84 +138,79 @@ export const Dice = () => {
     }
 
     const getDiceButtons = () => {
-        return DICE.map(die => getDieButton(die));
+        return DICE_MODELS.map(die => getDieButton(die));
     }
 
     return (
         <div className={"container dice-container"}>
-            <div className={"buttons is-centered"}>
-                <label className={"label"}>Dice Type</label>
-                {getDiceButtons()}
-            </div>
-
-            <div className={"block dice-options is-centered"}>
-                <div className="block field is-horizontal is-centered">
-                    <div className="field-label is-normal">
-                        <label className={"label"}>Range</label>
-                    </div>
-                    <div className="field-body">
-                        <div className="field">
-                            <p className={"control"}>
-                                <input
-                                    type={"number"}
-                                    className={"input dice-number"}
-                                    name={"dice-min"}
-                                    value={minResult}
-                                    onChange={(e) => setMinResult(parseInt(e.target.value))}
-                                />
-                            </p>
-                        </div>
-
-                        <div className="field">
-                            <p className={"control"}>
-                                <input
-                                    type={"number"}
-                                    className={"input dice-number"}
-                                    name={"dice-max"}
-                                    value={maxResult}
-                                    onChange={(e) => setMaxResult(parseInt(e.target.value))}
-                                />
-                            </p>
-                        </div>
+            <div className={"card dice-options"}>
+                <div className={"card-content is-centered"}>
+                    <div className={"buttons is-centered"}>
+                        {getDiceButtons()}
                     </div>
                 </div>
-                <div className={"block is-centered"}>
-                    <label className={"label"}>Number of Dice</label>
-                    <p className={"control"}>
-                        <input
-                            type={"number"}
-                            className={"input dice-number"}
-                            name={"number-of-dice"}
-                            value={numOfDice}
-                            min={1}
-                            onChange={(e) => changeNumOfDice(parseInt(e.target.value))}
-                        />
-                    </p>
+                <div className={"card-content is-flex"}>
+                    <div className="field is-flex-grow-1">
+                        <label>Min</label>
+                        <p className={"control"}>
+                            <input
+                                type={"number"}
+                                className={"input dice-number"}
+                                name={"dice-min"}
+                                value={minResult}
+                                onChange={(e) => setMinResult(parseInt(e.target.value))}
+                            />
+                        </p>
+                    </div>
+
+                    <div className="field is-flex-grow-1">
+                        <label>Max</label>
+                        <p className={"control"}>
+                            <input
+                                type={"number"}
+                                className={"input dice-number"}
+                                name={"dice-max"}
+                                value={maxResult}
+                                onChange={(e) => setMaxResult(parseInt(e.target.value))}
+                            />
+                        </p>
+                    </div>
+                </div>
+                <div className={"card-footer"}>
+                    <button
+                        className={"button is-primary card-footer-item"}
+                        onClick={(e) => addDie()}
+                    >
+                        Add Die
+                    </button>
                 </div>
             </div>
 
             <div className={"block"}/>
 
-            <div className={"block is-centered"}>
-                <div className={"buttons is-centered"}>
-                    <ToggleButton currentValue={throwMode} value={'FAST'} onClick={setThrowMode}>Fast</ToggleButton>
-                    <ToggleButton currentValue={throwMode} value={'POWER'} onClick={setThrowMode}>Power</ToggleButton>
+            <div className={"card dice-options"}>
+                <div className={"card-content"}>
+                    <div className={"buttons is-centered"}>
+                        <ToggleButton currentValue={throwMode} value={'FAST'} onClick={setThrowMode}>Fast</ToggleButton>
+                        <ToggleButton currentValue={throwMode} value={'POWER'}
+                                      onClick={setThrowMode}>Extra</ToggleButton>
+                    </div>
                 </div>
 
-                <div className={"block"}/>
-
-                <button
-                    className={"button is-primary"}
-                    onClick={(e) => throwDice()}
-                >
-                    Throw All
-                </button>
-
-                <div className={"block"}/>
-
-                <div className={"dice-results"}>
-                    {getResults(diceResults)}
+                <div className={"card-footer"}>
+                    <button
+                        className={"button is-primary card-footer-item"}
+                        onClick={(e) => throwDice()}
+                    >
+                        Throw All
+                    </button>
                 </div>
+            </div>
+
+            <div className={"block"}/>
+
+            <div className={"dice-results"}>
+                {getResults(dice)}
             </div>
         </div>
     );
