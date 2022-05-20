@@ -58,3 +58,15 @@ export const generateLink = (fragment: string) => {
     const href = window.location.href;
     return href.substring(0, href.indexOf("#")) + "#" + fragment;
 };
+
+export const sortByName = (nameA: string, nameB: string) => {
+    if (nameA < nameB) {
+        return -1;
+    }
+    if (nameA > nameB) {
+        return 1;
+    }
+
+    // names must be equal
+    return 0;
+}

@@ -5,9 +5,10 @@ import {
     NewLabelType,
     LabelType, NewLabelItem, LabelItemId, LabelItemIndex, LabelItem, findLabelTypeName
 } from "../common/CommonTypes";
-import {SecondaryButton, RemoveButton, DangerButton} from "../common/CommonInput";
+import {SecondaryButton, DangerButton} from "../common/CommonInput";
 import {useState} from "react";
 import {Collapse} from "../common/CommonComponents";
+import {sortByName} from "../common/Utils";
 
 export interface Props {
     labelTypeAdded: (label: NewLabelType) => void;
@@ -17,18 +18,6 @@ export interface Props {
     labelItemChanged: (typeId: LabelTypeId, item: LabelItem) => void;
     labels: LabelTypeIndex;
     labelItems: LabelItemIndex;
-}
-
-const sortByName = (nameA: string, nameB: string) => {
-    if (nameA < nameB) {
-        return -1;
-    }
-    if (nameA > nameB) {
-        return 1;
-    }
-
-    // names must be equal
-    return 0;
 }
 
 export interface LabelItemEditorProps {
