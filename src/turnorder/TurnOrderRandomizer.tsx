@@ -3,7 +3,7 @@ import PlayerList from "../player/PlayerList";
 import {NewLabelModal} from "../label/LabelModal";
 import {SecondaryButton} from "../common/CommonInput";
 import LabelTypeList from "../label/LabelList";
-import React, {useState} from "react";
+import React from "react";
 import PlayerOrder from "./PlayerOrder";
 import {
     LabelItem,
@@ -16,8 +16,8 @@ import {
     PlayerId,
     PlayerIndex, Status
 } from "../common/CommonTypes";
-import {generateLink, shuffle, toObject} from "../common/Utils";
-import {randomize} from "../common/Random";
+import {generateLink, toObject} from "../common/Utils";
+import {randomize, shuffle} from "../common/Random";
 import NumberPool from "../common/NumberPool";
 
 export interface Props {

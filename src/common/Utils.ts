@@ -1,13 +1,15 @@
-export const shuffle = (array: Array<number>): Array<number> => {
-    const shuffled = Array.from(array);
-    for (var i = shuffled.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = shuffled[i];
-        shuffled[i] = shuffled[j];
-        shuffled[j] = temp;
+export type ShuffleFunc = (array: Array<number>) => Array<number>;
+export type RandomProvider = (min: number, max: number, randomFunc: () => number) => number;
+
+export const clamp = (value: number, min: number, max: number): number => {
+    if (value < min) {
+        return min;
+    } else if (value > max) {
+        return max;
+    } else {
+        return value;
     }
-    return shuffled;
-};
+}
 
 export const isValueObject = (value: any): boolean => {
     return value !== null && typeof value === 'object';

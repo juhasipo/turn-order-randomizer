@@ -1,5 +1,13 @@
 export default class NumberPool {
-    currentValue: number = 0;
+    constructor(initialValue: number|undefined = undefined) {
+        if (initialValue !== undefined) {
+            this.currentValue = initialValue;
+        } else {
+            this.currentValue = 0;
+        }
+    }
+
+    currentValue: number;
 
     getNext(): number {
         return this.currentValue++;

@@ -1,6 +1,7 @@
 import {useState} from "react";
 import './Dice.scss'
 import {ToggleButton} from "../common/CommonInput";
+import {nextRandomNumber} from "../common/Random";
 
 type ThrowMode = 'FAST' | 'POWER';
 
@@ -82,10 +83,6 @@ export const Dice = () => {
             });
     }
 
-    const getRandomValue = (min: number, max: number): number => {
-        return Math.floor(Math.random() * (max - min + 1) + min);
-    }
-
     const getDieStats = (results: DiceResult[]) => {
         const stats: { [key: number]: number } = {};
         results.forEach(result => {
@@ -105,7 +102,7 @@ export const Dice = () => {
             const results = Array.from(dice);
             for (let i = 0; i < dice.length; ++i) {
                 const die = results[i];
-                die.result = getRandomValue(die.min, die.max);
+                die.result = nextRandomNumber(die.min, die.max, Math.random);
             }
             setDice(results);
         } else {
@@ -124,7 +121,7 @@ export const Dice = () => {
 
                 if (v.index !== null) {
                     const die = newDice[v.index];
-                    die.result = getRandomValue(die.min, die.max);
+                    die.result = nextRandomNumber(die.min, die.max, Math.random);
                 }
                 setDice(Array.from(newDice));
                 v.counter--;

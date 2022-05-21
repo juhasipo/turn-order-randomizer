@@ -1,8 +1,34 @@
-import {LabelItem, LabelItemIndex, LabelTypeId, LabelTypeIndex, PlayerIndex, PlayerLabel} from "./CommonTypes";
-import {shuffle} from "./Utils";
+import {
+    LabelItem,
+    LabelItemIndex,
+    LabelTypeId,
+    LabelTypeIndex, Player,
+    PlayerId,
+    PlayerIndex,
+    PlayerLabel
+} from "./CommonTypes";
+import {clamp, RandomProvider, ShuffleFunc} from "./Utils";
 import NumberPool from "./NumberPool";
 
-function clearItemIndex(labelTypes: LabelTypeIndex, labelItems: LabelItemIndex): LabelItemIndex {
+export const nextRandomNumber: RandomProvider = (min: number, max: number, randomFunc: () => number): number => {
+    // +1 is required because otherwise the max value would almost never be returned due to random returning 1.0
+    // is very rare. Also, the value needs to clamped to be between min and max because in case the 1.0 is returned
+    // by the randomFunc, the value would be too big.
+    return clamp(Math.floor(randomFunc() * (max - min + 1) + min), min, max);
+}
+
+export const shuffle: ShuffleFunc = (array: Array<number>): Array<number> => {
+    const shuffled = Array.from(array);
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        const temp = shuffled[i];
+        shuffled[i] = shuffled[randomIndex];
+        shuffled[randomIndex] = temp;
+    }
+    return shuffled;
+};
+
+export function clearItemIndex(labelTypes: LabelTypeIndex, labelItems: LabelItemIndex): LabelItemIndex {
     const newLabelItems: LabelItemIndex = new Map();
     // Filter out label items that are not dynamically generated
     Array.from(labelItems).forEach(([_, item]) => {
@@ -16,7 +42,12 @@ function clearItemIndex(labelTypes: LabelTypeIndex, labelItems: LabelItemIndex):
     return newLabelItems;
 }
 
-function generateLabelPoolWithDynamicItems(idPool: NumberPool, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex, players: PlayerIndex): Map<LabelTypeId, Array<LabelItem>> {
+export function generateLabelPoolWithDynamicItems(
+    idPool: NumberPool,
+    labelTypes: LabelTypeIndex,
+    labelItems: LabelItemIndex,
+    players: PlayerIndex
+): Map<LabelTypeId, Array<LabelItem>> {
     const labelItemPool: Map<LabelTypeId, Array<LabelItem>> = new Map();
     labelTypes.forEach(type => {
         console.log(`Label type: ${type.id}; ${type.name}; ${type.mode}`)
@@ -50,7 +81,7 @@ function generateLabelPoolWithDynamicItems(idPool: NumberPool, labelTypes: Label
     return labelItemPool;
 }
 
-function clearPlayers(players: PlayerIndex): PlayerIndex {
+export function clearPlayers(players: PlayerIndex): PlayerIndex {
     const newPlayers: PlayerIndex = new Map(players);
     Array.from(newPlayers).forEach(([id, player]) => {
         player.labels = new Map<LabelTypeId, PlayerLabel>();
@@ -58,7 +89,47 @@ function clearPlayers(players: PlayerIndex): PlayerIndex {
     return newPlayers;
 }
 
-export function randomize(idPool: NumberPool, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex, players: PlayerIndex): [LabelItemIndex, PlayerIndex] {
+export function randomizeLabelsForPlayers(
+    labelItemPool: Map<LabelTypeId, Array<LabelItem>>,
+    playerPool: number[],
+    players: PlayerIndex,
+    shuffleFunc: ShuffleFunc,
+    randomProvider: RandomProvider
+): PlayerIndex {
+    const newPlayers: PlayerIndex = new Map<PlayerId, Player>(Array.from(players));
+
+    labelItemPool.forEach((items, typeId) => {
+        // Shuffle the player order so that the same players don't always get the labels
+        // where there are no labels for everyone
+        shuffleFunc(playerPool).forEach((playerId) => {
+            const player = newPlayers.get(playerId);
+            // Make sure that there is a player, there are more labels
+            // and that player doesn't already have a label for that type
+            if (player && items.length > 0 && !player.labels.get(typeId)) {
+                const randomIndex = randomProvider(0, items.length, Math.random);
+                const randomLabelItem = items[randomIndex];
+                items.splice(randomIndex, 1)
+                const playerLabel: PlayerLabel = {
+                    dynamic: false,
+                    itemId: randomLabelItem.id,
+                    typeId: typeId,
+                }
+                player.labels.set(typeId, playerLabel);
+            }
+        });
+    });
+
+    return newPlayers;
+}
+
+export function randomize(
+    idPool: NumberPool,
+    labelTypes: LabelTypeIndex,
+    labelItems: LabelItemIndex,
+    players: PlayerIndex,
+    shuffleFunc: ShuffleFunc = shuffle,
+    randomProvider: RandomProvider = nextRandomNumber
+): [LabelItemIndex, PlayerIndex] {
     // 1. Generate index so that there are no dynamic items
     const newLabelItems = clearItemIndex(labelTypes, labelItems);
 
@@ -84,27 +155,8 @@ export function randomize(idPool: NumberPool, labelTypes: LabelTypeIndex, labelI
     });
 
     // 5. For each label type, set random labels and remove from the pool
-    labelItemPool.forEach((items, typeId) => {
-        // Shuffle the player order so that the same players don't always get the labels
-        // where there are no labels for everyone
-        shuffle(playerPool).forEach((playerId) => {
-            const player = newPlayers.get(playerId);
-            // Make sure that there is a player, there are more labels
-            // and that player doesn't already have a label for that type
-            if (player && items.length > 0 && !player.labels.get(typeId)) {
-                const randomIndex = Math.floor(Math.random() * items.length);
-                const randomLabelItem = items[randomIndex];
-                items.splice(randomIndex, 1)
-                const playerLabel: PlayerLabel = {
-                    dynamic: false,
-                    itemId: randomLabelItem.id,
-                    typeId: typeId,
-                }
-                player.labels.set(typeId, playerLabel);
-            }
-        });
-    });
+    const playersWithNewLabels = randomizeLabelsForPlayers(labelItemPool, playerPool, newPlayers, shuffleFunc, randomProvider);
 
     console.log("Augmented items: ", newLabelItems);
-    return [newLabelItems, newPlayers];
+    return [newLabelItems, playersWithNewLabels];
 }
