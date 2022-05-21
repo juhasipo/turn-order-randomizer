@@ -3,7 +3,7 @@ import './Dice.scss'
 import {ToggleButton} from "../common/CommonInput";
 import {nextRandomNumber} from "../common/Random";
 
-type ThrowMode = 'FAST' | 'POWER';
+type ThrowMode = 'FAST' | 'POWER' | 'POWER_ALL';
 
 interface Dice {
     name: string;
@@ -105,6 +105,27 @@ export const Dice = () => {
                 die.result = nextRandomNumber(die.min, die.max, Math.random);
             }
             setDice(results);
+        } else if (throwMode === 'POWER_ALL') {
+            const maxLength = dice.length;
+            const maxCounter = 40;
+            const newDice = Array.from(dice).map(die => {
+                die.result = undefined;
+                return die;
+            });
+            const v = {counter: maxCounter};
+            const interval = setInterval(function () {
+                if (v.counter < 0) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                for (let i = 0; i < maxLength; ++i) {
+                    const die = newDice[i];
+                    die.result = nextRandomNumber(die.min, die.max, Math.random);
+                }
+                setDice(Array.from(newDice));
+                v.counter--;
+            }, 50);
         } else {
             const maxCounter = 20;
             const newDice = Array.from(dice).map(die => {
@@ -190,7 +211,9 @@ export const Dice = () => {
                     <div className={"buttons is-centered"}>
                         <ToggleButton currentValue={throwMode} value={'FAST'} onClick={setThrowMode}>Fast</ToggleButton>
                         <ToggleButton currentValue={throwMode} value={'POWER'}
-                                      onClick={setThrowMode}>Extra</ToggleButton>
+                                      onClick={setThrowMode}>Lottery</ToggleButton>
+                        <ToggleButton currentValue={throwMode} value={'POWER_ALL'}
+                                      onClick={setThrowMode}>Lottery All Once</ToggleButton>
                     </div>
                 </div>
 
