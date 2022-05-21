@@ -3,7 +3,6 @@ export type LabelTypeId = number;
 export type LabelItemId = number;
 
 export interface PlayerLabel {
-    dynamic: boolean;
     typeId: LabelTypeId;
     itemId: LabelItemId;
 }
@@ -11,8 +10,6 @@ export interface PlayerLabel {
 export interface Player {
     id: number;
     name: string;
-    number?: number;
-    labels: Map<LabelTypeId, PlayerLabel>;
 }
 
 export interface NewPlayer {
@@ -44,6 +41,11 @@ export interface LabelItem {
 export type LabelTypeIndex = Map<LabelTypeId, LabelType>;
 export type LabelItemIndex = Map<LabelItemId, LabelItem>
 
+export interface LabelRef {
+    typeId: LabelTypeId;
+    itemId: LabelItemId;
+}
+export type PlayerLabelIndex = Map<PlayerId, Array<LabelRef>>
 
 export interface LabelTypeButton {
     mode: LabelTypeMode;

@@ -8,13 +8,13 @@ import PlayerOrder from "./PlayerOrder";
 import {
     LabelItem,
     LabelItemId,
-    LabelItemIndex, LabelTypeId,
+    LabelItemIndex, LabelRef, LabelTypeId,
     LabelTypeIndex, LabelTypeMode,
     NewLabelItem,
     NewLabelType,
     NewPlayer,
     PlayerId,
-    PlayerIndex, Status
+    PlayerIndex, PlayerLabelIndex, Status
 } from "../common/CommonTypes";
 import {generateLink, toObject} from "../common/Utils";
 import {randomize, shuffle} from "../common/Random";
@@ -51,6 +51,7 @@ export const TurnOrderRandomizer = (props: Props) => {
     const [playerOrder, setPlayerOrder] = React.useState<Array<PlayerId>>(status.playerOrder);
     const [labelTypes, setLabelTypes] = React.useState<LabelTypeIndex>(status.labelTypes);
     const [labelItems, setLabelItems] = React.useState<LabelItemIndex>(status.labelItems);
+    const [playerLabels, setPlayerLabels] = React.useState<PlayerLabelIndex>(new Map<PlayerId, Array<LabelRef>>());
     const [link, setLink] = React.useState('');
     const [labelModalOpen, setLabelModalOpen] = React.useState<boolean>(false);
 
@@ -69,9 +70,9 @@ export const TurnOrderRandomizer = (props: Props) => {
     }
 
     const randomizeLabels = () => {
-        const [newLabelItems, newPlayers] = randomize(idPool, labelTypes, labelItems, players);
+        const [newLabelItems, playerLabels] = randomize(idPool, labelTypes, labelItems, players);
         setLabelItems(newLabelItems);
-        setPlayers(newPlayers);
+        setPlayerLabels(playerLabels);
     }
 
     const playerAdded = (player: NewPlayer) => {
@@ -247,6 +248,7 @@ export const TurnOrderRandomizer = (props: Props) => {
                 randomizeLabels={randomizeLabels}
                 labelTypes={labelTypes}
                 labelItems={labelItems}
+                playerLabels={playerLabels}
             />
         </div>
     )

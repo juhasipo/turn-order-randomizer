@@ -1,14 +1,14 @@
 import * as React from 'react';
 import {
     LabelItem,
-    LabelItemIndex,
+    LabelItemIndex, LabelRef,
     LabelType,
     LabelTypeId,
     LabelTypeIndex,
     Player,
     PlayerId,
     PlayerIndex,
-    PlayerLabel
+    PlayerLabel, PlayerLabelIndex
 } from "../common/CommonTypes";
 import {PrimaryButton, SecondaryButton} from "../common/CommonInput";
 import './PlayerOrder.scss'
@@ -21,11 +21,12 @@ export interface Props {
     randomizeLabels: () => void;
     labelTypes: LabelTypeIndex;
     labelItems: LabelItemIndex;
+    playerLabels: PlayerLabelIndex;
 }
 
 export interface PlayerLabelProps {
     player: Player|undefined;
-    labels: Map<LabelTypeId, PlayerLabel>;
+    labels?: Array<LabelRef>;
     labelTypes: LabelTypeIndex;
     labelItems: LabelItemIndex;
 }
@@ -58,9 +59,9 @@ const PlayerLabels = (props: PlayerLabelProps) => {
 
     const getLabels = () => {
         const p = props;
-        return Array.from(props.labels).map(([id, playerLabel]) => {
-            const type = p.labelTypes.get(playerLabel.typeId);
-            const item = p.labelItems.get(playerLabel.itemId);
+        return props.labels?.map(labelRef => {
+            const type = p.labelTypes.get(labelRef.typeId);
+            const item = p.labelItems.get(labelRef.itemId);
 
             if (type && item) {
                 return getLabel(type, item);
@@ -70,8 +71,8 @@ const PlayerLabels = (props: PlayerLabelProps) => {
         })
     }
 
-    const hasLabels = (labels: Map<LabelTypeId, PlayerLabel>) => {
-        return labels.size > 0;
+    const hasLabels = (labels?: Array<LabelRef>) => {
+        return !!labels && labels.length > 0;
     }
 
     if (hasLabels(props.labels)) {
@@ -91,7 +92,7 @@ const PlayerLabels = (props: PlayerLabelProps) => {
 
 export default class PlayerOrder extends React.Component<Props, any> {
 
-    getPlayerItem = (order: number, player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
+    getPlayerItem = (order: number, player: Player|undefined, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex, playerLabels: PlayerLabelIndex) => {
         if (player) {
             return (
                 <div key={'player-' + player.id} className={"column is-one-quarter"}>
@@ -106,7 +107,7 @@ export default class PlayerOrder extends React.Component<Props, any> {
                         <div className={"card-content"}>
                             <PlayerLabels
                                 player={player}
-                                labels={player.labels}
+                                labels={playerLabels.get(player.id)}
                                 labelTypes={labelTypes}
                                 labelItems={labelItems}
                             />
@@ -119,9 +120,9 @@ export default class PlayerOrder extends React.Component<Props, any> {
         }
     }
 
-    getPlayerItems = (players: PlayerIndex, playerOrder: Array<PlayerId>, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex) => {
+    getPlayerItems = (players: PlayerIndex, playerOrder: Array<PlayerId>, labelTypes: LabelTypeIndex, labelItems: LabelItemIndex, labels: PlayerLabelIndex) => {
         return playerOrder.map((id, index) => {
-            return this.getPlayerItem(index + 1, players.get(id), labelTypes, labelItems)
+            return this.getPlayerItem(index + 1, players.get(id), labelTypes, labelItems, labels)
         });
     }
 
@@ -136,7 +137,7 @@ export default class PlayerOrder extends React.Component<Props, any> {
                 ]}
             >
                 <div className={"columns is-multiline"}>
-                    {this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems)}
+                    {this.getPlayerItems(this.props.players, this.props.playerOrder, this.props.labelTypes, this.props.labelItems, this.props.playerLabels)}
                 </div>
             </Collapse>
         );

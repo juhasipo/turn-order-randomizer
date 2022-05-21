@@ -1,6 +1,5 @@
 import {
     clearItemIndex,
-    clearPlayers,
     generateLabelPoolWithDynamicItems,
     nextRandomNumber,
     randomizeLabelsForPlayers
@@ -8,12 +7,12 @@ import {
 import {
     LabelItem,
     LabelItemId,
-    LabelItemIndex,
+    LabelItemIndex, LabelRef,
     LabelType,
     LabelTypeId,
     LabelTypeIndex,
     Player, PlayerId,
-    PlayerIndex, PlayerLabel
+    PlayerIndex, PlayerLabelIndex
 } from "./CommonTypes";
 import NumberPool from "./NumberPool";
 import {RandomProvider, ShuffleFunc} from "./Utils";
@@ -199,7 +198,7 @@ describe("generateLabelPoolWithDynamicItems", () => {
             [2000, {id: 2000, name: "Some text", typeId: 1000}]
         ]);
         const players: PlayerIndex = new Map<PlayerId, Player>([
-            [3001, {id: 3001, name: "Player 1", labels: new Map<LabelTypeId, PlayerLabel>()}],
+            [3001, {id: 3001, name: "Player 1"}],
         ]);
 
         const result = generateLabelPoolWithDynamicItems(idPool, labelTypes, labelItems, players);
@@ -217,7 +216,7 @@ describe("generateLabelPoolWithDynamicItems", () => {
             [2000, {id: 2000, name: "1", typeId: 1000}]
         ]);
         const players: PlayerIndex = new Map<PlayerId, Player>([
-            [3001, {id: 3001, name: "Player 1", labels: new Map<LabelTypeId, PlayerLabel>()}],
+            [3001, {id: 3001, name: "Player 1"}],
         ]);
 
         const result = generateLabelPoolWithDynamicItems(idPool, labelTypes, labelItems, players);
@@ -233,7 +232,7 @@ describe("generateLabelPoolWithDynamicItems", () => {
         ]);
         const labelItems: LabelItemIndex = new Map<LabelItemId, LabelItem>();
         const players: PlayerIndex = new Map<PlayerId, Player>([
-            [3001, {id: 3001, name: "Player 1", labels: new Map<LabelTypeId, PlayerLabel>()}],
+            [3001, {id: 3001, name: "Player 1"}],
         ]);
 
         const result = generateLabelPoolWithDynamicItems(idPool, labelTypes, labelItems, players);
@@ -249,9 +248,9 @@ describe("generateLabelPoolWithDynamicItems", () => {
         ]);
         const labelItems: LabelItemIndex = new Map<LabelItemId, LabelItem>();
         const players: PlayerIndex = new Map<PlayerId, Player>([
-            [3001, {id: 3001, name: "Player 1", labels: new Map<LabelTypeId, PlayerLabel>()}],
-            [3002, {id: 3002, name: "Player 2", labels: new Map<LabelTypeId, PlayerLabel>()}],
-            [3003, {id: 3003, name: "Player 3", labels: new Map<LabelTypeId, PlayerLabel>()}],
+            [3001, {id: 3001, name: "Player 1"}],
+            [3002, {id: 3002, name: "Player 2"}],
+            [3003, {id: 3003, name: "Player 3"}],
         ]);
 
         const result = generateLabelPoolWithDynamicItems(idPool, labelTypes, labelItems, players);
@@ -267,7 +266,7 @@ describe("generateLabelPoolWithDynamicItems", () => {
         ]);
         const labelItems: LabelItemIndex = new Map<LabelItemId, LabelItem>();
         const players: PlayerIndex = new Map<PlayerId, Player>([
-            [3001, {id: 3001, name: "Player 1", labels: new Map<LabelTypeId, PlayerLabel>()}],
+            [3001, {id: 3001, name: "Player 1"}],
         ]);
 
         const result = generateLabelPoolWithDynamicItems(idPool, labelTypes, labelItems, players);
@@ -283,9 +282,9 @@ describe("generateLabelPoolWithDynamicItems", () => {
         ]);
         const labelItems: LabelItemIndex = new Map<LabelItemId, LabelItem>();
         const players: PlayerIndex = new Map<PlayerId, Player>([
-            [3001, {id: 3001, name: "Player 1", labels: new Map<LabelTypeId, PlayerLabel>()}],
-            [3002, {id: 3002, name: "Player 2", labels: new Map<LabelTypeId, PlayerLabel>()}],
-            [3003, {id: 3003, name: "Player 3", labels: new Map<LabelTypeId, PlayerLabel>()}],
+            [3001, {id: 3001, name: "Player 1"}],
+            [3002, {id: 3002, name: "Player 2"}],
+            [3003, {id: 3003, name: "Player 3"}],
         ]);
 
         const result = generateLabelPoolWithDynamicItems(idPool, labelTypes, labelItems, players);
@@ -300,107 +299,13 @@ describe("generateLabelPoolWithDynamicItems", () => {
     });
 });
 
-
-describe('clearPlayers', () => {
-    test('No players', () => {
-        const playerIndex: PlayerIndex = new Map<PlayerId, Player>();
-
-        const result = clearPlayers(playerIndex);
-
-        expect(result).toEqual(new Map<PlayerId, Player>());
-    });
-
-    test('One player, no labels', () => {
-        const playerIndex: PlayerIndex = new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(),
-                }
-            ]
-        ]);
-    })
-
-    test('One player, many labels', () => {
-        const playerIndex: PlayerIndex = new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: true, typeId: 1000, itemId: 2000}],
-                        [1001, {dynamic: false, typeId: 1001, itemId: 2001}],
-                    ])),
-                }
-            ]
-        ]);
-
-        const result = clearPlayers(playerIndex);
-
-        expect(result).toEqual(new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(),
-                }]
-        ]));
-    });
-
-
-    test('Many player, many labels', () => {
-        const playerIndex: PlayerIndex = new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: true, typeId: 1000, itemId: 2000}],
-                        [1001, {dynamic: false, typeId: 1001, itemId: 2001}],
-                    ])),
-                }
-            ],
-            [3001,
-                {
-                    id: 3001,
-                    name: "Player 2",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: true, typeId: 1000, itemId: 2002}],
-                        [1001, {dynamic: false, typeId: 1001, itemId: 2003}],
-                    ])),
-                }
-            ]
-        ]);
-
-        const result = clearPlayers(playerIndex);
-
-        expect(result).toEqual(new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(),
-                }
-            ],
-            [3001,
-                {
-                    id: 3001,
-                    name: "Player 2",
-                    labels: new Map<LabelTypeId, PlayerLabel>(),
-                }
-            ]
-        ]));
-    });
-});
-
-
 describe('randomizeLabelsForPlayers', () => {
     const NO_SHUFFLE: ShuffleFunc = array => array;
     const RANDOM_MIN: RandomProvider = ((min, max) => min);
+    const RANDOM_MAX: RandomProvider = ((min, max) => max);
 
     test('None', () => {
-        const result = randomizeLabelsForPlayers(
+        const result: PlayerLabelIndex = randomizeLabelsForPlayers(
             new Map<LabelTypeId, Array<LabelItem>>(),
             [],
             new Map<PlayerId, Player>(),
@@ -415,53 +320,53 @@ describe('randomizeLabelsForPlayers', () => {
         const labelItemPool = new Map<LabelTypeId, Array<LabelItem>>([
             [1000, [
                 {id: 2000, typeId: 1000, name: "Label 1"},
-                {id: 2001, typeId: 1000, name: "Label 2"}
+                {id: 2001, typeId: 1000, name: "Label 2"},
             ]],
         ]);
         const playerIndex: PlayerIndex = new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([])),
-                }
-            ],
-            [3001,
-                {
-                    id: 3001,
-                    name: "Player 2",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([])),
-                }
-            ]
+            [3000, {id: 3000, name: "Player 1"}],
+            [3001, {id: 3001, name: "Player 2"}],
         ]);
+        const playerPool = [3000, 3001];
 
-        const result = randomizeLabelsForPlayers(
+        const result: PlayerLabelIndex = randomizeLabelsForPlayers(
             labelItemPool,
-            [3000, 3001],
+            playerPool,
             playerIndex,
             NO_SHUFFLE,
             RANDOM_MIN
         );
 
-        expect(result).toEqual(new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: false, typeId: 1000, itemId: 2000}]
-                    ])),
-                }
-            ],
-            [3001,
-                {
-                    id: 3001,
-                    name: "Player 2",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: false, typeId: 1000, itemId: 2001}]
-                    ])),
-                }
-            ]
+        expect(result).toEqual(new Map<PlayerId, Array<LabelRef>>([
+            [3000, [{typeId: 1000, itemId: 2000}]],
+            [3001, [{typeId: 1000, itemId: 2001}]],
+        ]));
+    });
+
+    test('Players and one label type max label index', () => {
+        const labelItemPool = new Map<LabelTypeId, Array<LabelItem>>([
+            [1000, [
+                {id: 2000, typeId: 1000, name: "Label 1"},
+                {id: 2001, typeId: 1000, name: "Label 2"},
+            ]],
+        ]);
+        const playerIndex: PlayerIndex = new Map<PlayerId, Player>([
+            [3000, {id: 3000, name: "Player 1"}],
+            [3001, {id: 3001, name: "Player 2"}],
+        ]);
+        const playerPool = [3000, 3001];
+
+        const result: PlayerLabelIndex = randomizeLabelsForPlayers(
+            labelItemPool,
+            playerPool,
+            playerIndex,
+            NO_SHUFFLE,
+            RANDOM_MAX
+        );
+
+        expect(result).toEqual(new Map<PlayerId, Array<LabelRef>>([
+            [3000, [{typeId: 1000, itemId: 2001}]],
+            [3001, [{typeId: 1000, itemId: 2000}]],
         ]));
     });
 
@@ -481,52 +386,30 @@ describe('randomizeLabelsForPlayers', () => {
             ]],
         ]);
         const playerIndex: PlayerIndex = new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([])),
-                }
-            ],
-            [3001,
-                {
-                    id: 3001,
-                    name: "Player 2",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([])),
-                }
-            ]
+            [3000, {id: 3000, name: "Player 1"}],
+            [3001, {id: 3001, name: "Player 2"}]
         ]);
 
-        const result = randomizeLabelsForPlayers(
+        const playerPool = [3000, 3001];
+
+        const result: PlayerLabelIndex = randomizeLabelsForPlayers(
             labelItemPool,
-            [3000, 3001],
+            playerPool,
             playerIndex,
             NO_SHUFFLE,
             RANDOM_MIN
         );
 
-        expect(result).toEqual(new Map<PlayerId, Player>([
-            [3000,
-                {
-                    id: 3000,
-                    name: "Player 1",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: false, typeId: 1000, itemId: 2000}],
-                        [1001, {dynamic: false, typeId: 1001, itemId: 2002}],
-                        [1002, {dynamic: false, typeId: 1002, itemId: 2005}],
-                    ])),
-                }
-            ],
-            [3001,
-                {
-                    id: 3001,
-                    name: "Player 2",
-                    labels: new Map<LabelTypeId, PlayerLabel>(new Map<LabelTypeId, PlayerLabel>([
-                        [1000, {dynamic: false, typeId: 1000, itemId: 2001}],
-                        [1001, {dynamic: false, typeId: 1001, itemId: 2003}],
-                    ])),
-                }
-            ]
+        expect(result).toEqual(new Map<PlayerId, Array<LabelRef>>([
+            [3000, [
+                {typeId: 1000, itemId: 2000},
+                {typeId: 1001, itemId: 2002},
+                {typeId: 1002, itemId: 2005},
+            ]],
+            [3001, [
+                {typeId: 1000, itemId: 2001},
+                {typeId: 1001, itemId: 2003},
+            ]]
         ]));
     });
 });

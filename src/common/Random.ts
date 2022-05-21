@@ -1,11 +1,11 @@
 import {
     LabelItem,
-    LabelItemIndex,
+    LabelItemIndex, LabelRef,
     LabelTypeId,
     LabelTypeIndex, Player,
     PlayerId,
     PlayerIndex,
-    PlayerLabel
+    PlayerLabel, PlayerLabelIndex
 } from "./CommonTypes";
 import {clamp, RandomProvider, ShuffleFunc} from "./Utils";
 import NumberPool from "./NumberPool";
@@ -81,45 +81,41 @@ export function generateLabelPoolWithDynamicItems(
     return labelItemPool;
 }
 
-export function clearPlayers(players: PlayerIndex): PlayerIndex {
-    const newPlayers: PlayerIndex = new Map(players);
-    Array.from(newPlayers).forEach(([id, player]) => {
-        player.labels = new Map<LabelTypeId, PlayerLabel>();
-    });
-    return newPlayers;
-}
-
 export function randomizeLabelsForPlayers(
     labelItemPool: Map<LabelTypeId, Array<LabelItem>>,
     playerPool: number[],
     players: PlayerIndex,
     shuffleFunc: ShuffleFunc,
     randomProvider: RandomProvider
-): PlayerIndex {
-    const newPlayers: PlayerIndex = new Map<PlayerId, Player>(Array.from(players));
+): PlayerLabelIndex {
+    const labels: PlayerLabelIndex = new Map<PlayerId, Array<LabelRef>>();
 
     labelItemPool.forEach((items, typeId) => {
         // Shuffle the player order so that the same players don't always get the labels
         // where there are no labels for everyone
         shuffleFunc(playerPool).forEach((playerId) => {
-            const player = newPlayers.get(playerId);
+            let labelArray = labels.get(playerId);
+            if (!labelArray) {
+                labelArray = [];
+                labels.set(playerId, labelArray);
+            }
+
             // Make sure that there is a player, there are more labels
             // and that player doesn't already have a label for that type
-            if (player && items.length > 0 && !player.labels.get(typeId)) {
-                const randomIndex = randomProvider(0, items.length, Math.random);
+            if (items.length > 0) {
+                const randomIndex = randomProvider(0, items.length-1, Math.random);
                 const randomLabelItem = items[randomIndex];
                 items.splice(randomIndex, 1)
-                const playerLabel: PlayerLabel = {
-                    dynamic: false,
+                const playerLabel: LabelRef = {
                     itemId: randomLabelItem.id,
                     typeId: typeId,
                 }
-                player.labels.set(typeId, playerLabel);
+                labelArray.push(playerLabel);
             }
         });
     });
 
-    return newPlayers;
+    return labels;
 }
 
 export function randomize(
@@ -129,7 +125,7 @@ export function randomize(
     players: PlayerIndex,
     shuffleFunc: ShuffleFunc = shuffle,
     randomProvider: RandomProvider = nextRandomNumber
-): [LabelItemIndex, PlayerIndex] {
+): [LabelItemIndex, PlayerLabelIndex] {
     // 1. Generate index so that there are no dynamic items
     const newLabelItems = clearItemIndex(labelTypes, labelItems);
 
@@ -147,16 +143,15 @@ export function randomize(
         })
     });
 
-    // 4. For each player, clear all non-fixed labels and generate
-    // player pool which order can be randomized during the randomization phase
-    const newPlayers = clearPlayers(players);
-    const playerPool = Array.from(newPlayers).map(([id, player]) => {
+    // 4. Create layer pool which order can be randomized during the randomization phase
+    const playerPool = Array.from(players).map(([id, player]) => {
         return id;
     });
 
     // 5. For each label type, set random labels and remove from the pool
-    const playersWithNewLabels = randomizeLabelsForPlayers(labelItemPool, playerPool, newPlayers, shuffleFunc, randomProvider);
+    const playerLabels = randomizeLabelsForPlayers(labelItemPool, playerPool, players, shuffleFunc, randomProvider);
 
-    console.log("Augmented items: ", newLabelItems);
-    return [newLabelItems, playersWithNewLabels];
+    console.log("Labels: ", playerLabels);
+    console.log("New label items: ", newLabelItems);
+    return [newLabelItems, playerLabels];
 }
