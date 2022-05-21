@@ -83,12 +83,12 @@ export const Dice = () => {
             });
     }
 
-    const getDieStats = (results: DiceResult[]) => {
+    const getDieStats = (results: Dice[]) => {
         const stats: { [key: number]: number } = {};
         results.forEach(result => {
-            if (result !== null) {
-                const v = stats[result] || 0;
-                stats[result] = v + 1;
+            if (result && result.result !== undefined) {
+                const v = stats[result.result] || 0;
+                stats[result.result] = v + 1;
             }
         })
 
@@ -208,6 +208,10 @@ export const Dice = () => {
 
             <div className={"dice-results"}>
                 {getResults(dice)}
+            </div>
+
+            <div>
+                {getDieStats(dice)}
             </div>
         </div>
     );
