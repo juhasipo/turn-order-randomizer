@@ -3,12 +3,11 @@ import {
     LabelItem,
     LabelItemIndex, LabelRef,
     LabelType,
-    LabelTypeId,
     LabelTypeIndex,
     Player,
     PlayerId,
     PlayerIndex,
-    PlayerLabel, PlayerLabelIndex
+    PlayerLabelIndex
 } from "../common/CommonTypes";
 import {PrimaryButton, SecondaryButton} from "../common/CommonInput";
 import './PlayerOrder.scss'

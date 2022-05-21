@@ -2,11 +2,6 @@ export type PlayerId = number;
 export type LabelTypeId = number;
 export type LabelItemId = number;
 
-export interface PlayerLabel {
-    typeId: LabelTypeId;
-    itemId: LabelItemId;
-}
-
 export interface Player {
     id: number;
     name: string;

@@ -2,10 +2,10 @@ import {
     LabelItem,
     LabelItemIndex, LabelRef,
     LabelTypeId,
-    LabelTypeIndex, Player,
+    LabelTypeIndex,
     PlayerId,
     PlayerIndex,
-    PlayerLabel, PlayerLabelIndex
+    PlayerLabelIndex
 } from "./CommonTypes";
 import {clamp, RandomProvider, ShuffleFunc} from "./Utils";
 import NumberPool from "./NumberPool";
