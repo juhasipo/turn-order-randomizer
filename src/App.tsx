@@ -32,10 +32,6 @@ if (fragment) {
         const jsonStatus = JSON.parse(window.atob(statusBase64));
         console.log("JSON value", jsonStatus);
 
-        const m = new Map();
-        for (let value in jsonStatus) {
-            m.set(value, new Map(Object.entries(jsonStatus[value])));
-        }
         status = {
             players: toMap(jsonStatus["players"]),
             labelTypes: toMap(jsonStatus["labelTypes"]),
