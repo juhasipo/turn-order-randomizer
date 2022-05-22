@@ -47,3 +47,26 @@ export const Collapse = (props: CollapseProps) => {
         </div>
     )
 }
+
+export interface TabItem {
+    name: string;
+    value: string;
+}
+
+export interface TabsProps {
+    onChange: (selected: string) => void;
+    current: string;
+    values: TabItem[];
+}
+
+export const Tabs = (props: TabsProps) => {
+    return (
+        <ul>
+            {props.values.map(item => (
+                <li className={props.current === item.value ? "is-active" : ''}>
+                    <a onClick={(e) => props.onChange(item.value)}>{item.name}</a>
+                </li>
+            ))}
+        </ul>
+    );
+}

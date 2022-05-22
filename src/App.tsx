@@ -12,6 +12,7 @@ import {toMap} from "./common/Utils";
 import NumberPool from "./common/NumberPool";
 import {Dice} from "./dice/Dice";
 import {TurnOrderRandomizer} from "./turnorder/TurnOrderRandomizer";
+import {Tabs} from "./common/CommonComponents";
 
 
 const idPool = new NumberPool();
@@ -74,14 +75,13 @@ const App = () => {
                 </div>
             </header>
             <section className={"tabs is-centered"}>
-                <ul>
-                    <li className={selectedTab === 'tor' ? "is-active" : ''}>
-                        <a onClick={(e) => setSelectedTab('tor')}>TOR</a>
-                    </li>
-                    <li className={selectedTab === 'dice' ? "is-active" : ''}>
-                        <a onClick={(e) => setSelectedTab('dice')}>Dice</a>
-                    </li>
-                </ul>
+                <Tabs
+                    onChange={setSelectedTab}
+                    current={selectedTab}
+                    values={[
+                            {name: 'TOR', value: 'tor'},
+                            {name: 'Dice', value: 'dice'},
+                    ]}/>
             </section>
             <main className={"section"}>
                 {selectedTab === 'tor' &&(
